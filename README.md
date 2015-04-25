@@ -70,6 +70,12 @@ GraphsJ features a fairly easy-to-use interface, but you can find out more about
 You can also consult the [pseudocode](https://github.com/giancosta86/GraphsJ/blob/master/pseudocode.pdf) of the standard algorithms provided by the application.
 
 
+## Examples
+
+A few example files are available, ready to run within GraphsJ:
+ 
+[Download the example files](https://github.com/giancosta86/GraphsJ/releases/download/v3.7/GraphsJ_3_Examples.zip)
+
 
 ## Special thanks
 
