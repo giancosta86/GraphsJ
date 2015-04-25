@@ -1,0 +1,38 @@
+body {
+    font-family: sans-serif;
+    background: #ebf4e9;
+}           
+
+
+h1 {
+    text-align: center;                
+    font-size: 30px;
+    margin-bottom: 50px;
+}
+
+
+h2 {
+    font-size: 18px;                
+    text-decoration: underline;
+    margin-bottom: 30px;
+}            
+
+
+li {
+    margin-bottom: 20px;
+}                  
+
+
+section {
+    margin-bottom: 50px;
+}
+
+
+.placeHolder:before {
+    content: "<";
+}
+
+
+.placeHolder:after {
+    content: ">";
+}

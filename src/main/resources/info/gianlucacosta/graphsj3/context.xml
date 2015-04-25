@@ -1,0 +1,63 @@
+<!--§
+  ===========================================================================
+  GraphsJ
+  ===========================================================================
+  Copyright (C) 2009-2015 Gianluca Costa
+  ===========================================================================
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  ===========================================================================
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+
+       default-autowire="constructor"
+        >
+
+    <bean class="info.gianlucacosta.helios.fx.dialogs.message.DialogBasedOutputService"/>
+
+    <bean class="info.gianlucacosta.helios.fx.dialogs.input.DialogBasedCommonInputService"/>
+
+    <bean class="info.gianlucacosta.helios.fx.fxml.SpringFXMLLoader"
+          scope="prototype"/>
+
+    <bean class="info.gianlucacosta.helios.serialization.xml.XStreamXmlSerializationService"/>
+
+
+    <bean class="info.gianlucacosta.arcontes.algorithms.run.DefaultAlgorithmRunService"/>
+
+
+    <bean class="info.gianlucacosta.graphsj3.GraphsJAppInfoService"/>
+
+
+    <bean class="info.gianlucacosta.graphsj3.GraphsJPreferencesService"/>
+    <bean class="info.gianlucacosta.helios.recentfiles.DefaultRecentFilesService"/>
+
+
+    <bean class="info.gianlucacosta.graphsj3.stages.main.DefaultMainWindow"/>
+    <bean class="info.gianlucacosta.graphsj3.stages.main.DefaultMainWindowController"/>
+
+    <bean class="info.gianlucacosta.graphsj3.stages.newscenario.DefaultNewScenarioDialog"/>
+    <bean class="info.gianlucacosta.graphsj3.stages.newscenario.DefaultNewScenarioDialogController"/>
+    <bean class="info.gianlucacosta.graphsj3.stages.newscenario.DefaultScenarioDiscoveryService"/>
+
+    <bean class="info.gianlucacosta.graphsj3.stages.about.DefaultAboutDialog"/>
+    <bean class="info.gianlucacosta.graphsj3.stages.about.DefaultAboutDialogController"/>
+
+
+    <bean class="info.gianlucacosta.graphsj3.workspace.ScenarioXStreamSerializationOptions"/>
+</beans>

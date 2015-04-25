@@ -1,0 +1,6 @@
+.buttonsPane {
+    -fx-background-color: #ccffcc;    
+    -fx-border-style: solid;
+    -fx-border-size: 1px;
+    -fx-border-color: black;
+}

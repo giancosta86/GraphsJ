@@ -1,0 +1,224 @@
+/*§
+  ===========================================================================
+  GraphsJ
+  ===========================================================================
+  Copyright (C) 2009-2015 Gianluca Costa
+  ===========================================================================
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  ===========================================================================
+*/
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://dl.bintray.com/giancosta86/Hephaestus'
+        }
+
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:3.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
+        classpath 'info.gianlucacosta.aurora:aurora:2.1'
+    }
+}
+
+
+import groovy.xml.NamespaceBuilder
+import groovy.xml.NamespaceBuilderSupport
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'info.gianlucacosta.aurora'
+
+
+group = 'info.gianlucacosta.graphsj'
+archivesBaseName = 'graphsj'
+version = '3.7'
+
+description = 'Elegant and modern didactic application for running graph algorithms'
+
+project.ext.facebookPage = 'https://www.facebook.com/graphsj'
+
+
+mainClassName = "info.gianlucacosta.graphsj3.Main"
+
+
+
+dependencies {
+    compile 'info.gianlucacosta.helios:helios-xml:1.7'
+    compile 'info.gianlucacosta.helios:helios-spring:1.7'
+    compile 'info.gianlucacosta.graphsj:graphsj-algorithms:3.5'
+    compile 'log4j:log4j:1.2.17'
+
+    runtime 'org.slf4j:slf4j-log4j12:1.7.2'
+}
+
+
+
+final String jdkHome = System.env['JAVA_HOME']
+
+
+final NamespaceBuilderSupport antfx = NamespaceBuilder.newInstance(
+        ant,
+        'javafx:com.sun.javafx.tools.ant'
+)
+
+ant.taskdef(
+        resource: 'com/sun/javafx/tools/ant/antlib.xml',
+        uri: 'javafx:com.sun.javafx.tools.ant',
+        classpath: "${jdkHome}/lib/ant-javafx.jar"
+)
+
+
+final String webstartTempDir = "${project.buildDir}/tmp/webstart"
+
+
+
+processResources {
+    filesMatching('**/App.properties.xml') {
+        filter ReplaceTokens, tokens: [
+                'name'          : project.name,
+                'version'       : project.version,
+                'copyrightYears': project.moonLicense.getCopyrightYears(),
+                'license'       : project.moonLicense.license.name,
+                'url'           : project.url.toString(),
+                'facebookPage'  : project.facebookPage,
+                'release'       : project.auroraSettings.release.toString()
+        ]
+    }
+}
+
+
+
+aurora {
+    docTask = 'javadoc'
+    gitHubUser = 'giancosta86'
+
+    author {
+        name = 'Gianluca Costa'
+        email = 'gianluca@gianlucacosta.info'
+        url = 'http://gianlucacosta.info/'
+    }
+
+    bintray {
+        user = project.bintrayUser
+        key = project.bintrayKey
+        repo = 'Hephaestus'
+        licenses = ['GPL-3.0']
+        labels = ['GraphsJ', 'graphs', 'didactic', 'application', 'Java']
+    }
+}
+
+
+moonLicense {
+    license = gpl3
+
+    productInfo {
+        productName = 'GraphsJ'
+        inceptionYear = 2009
+        copyrightHolder = 'Gianluca Costa'
+    }
+}
+
+
+
+task webstartCopyJars(type: Copy, dependsOn: 'installDist') {
+    from("${project.buildDir}/install/${project.name}")
+    into(webstartTempDir)
+    include('lib/*.jar')
+}
+
+
+task('webstartSign', dependsOn: 'webstartCopyJars') << {
+    antfx.signjar(
+            keystore: project.'jar.signing.keystore.path',
+            storepass: project.'jar.signing.keystore.password',
+            storetype: project.'jar.signing.keystore.type',
+            alias: project.'jar.signing.key.alias'
+    ) {
+        antfx.fileset(
+                dir: "${webstartTempDir}",
+                includes: 'lib/*.jar'
+        )
+    }
+}
+
+
+task('webstart', dependsOn: 'webstartSign') << {
+    antfx.deploy(
+            outdir: "${project.buildDir}/webstart",
+            outfile: 'GraphsJ_3',
+            width: 400,
+            height: 300,
+            offlineAllowed: true
+    ) {
+        antfx.application(
+                name: 'GraphsJ 3',
+                mainClass: project.mainClassName
+        )
+
+        antfx.platform(
+                javafx: '8.0+',
+                j2se: '1.8+'
+        )
+
+        antfx.info(
+                title: 'GraphsJ 3',
+                vendor: 'Gianluca Costa',
+                copyright: "Copyright © ${moonLicense.copyrightYears} Gianluca Costa",
+                license: moonLicense.license.name,
+                description: project.description
+        ) {
+
+            antfx.icon(
+                    href: 'mainIcon32.png'
+            )
+        }
+
+
+        antfx.permissions(
+                elevated: true,
+                cachecertificates: true
+        )
+
+
+        antfx.preferences(
+                shortcut: true,
+                install: false,
+                menu: false
+        )
+
+
+        antfx.resources {
+            antfx.fileset(
+                    type: 'icon',
+                    dir: "${project.projectDir}/src/main/resources/info/gianlucacosta/graphsj3/icons",
+                    includes: 'mainIcon32.png'
+            )
+
+
+            antfx.fileset(
+                    dir: webstartTempDir,
+                    includes: 'lib/*.jar'
+            )
+        }
+    }
+}
+
+
+assemble.dependsOn('distZip', 'webstart')

@@ -1,0 +1,12 @@
+.root {
+    -fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #dcf2eeff, lightgreen);
+}
+
+.contentNode .text {
+    -fx-fill: navy;
+}
+
+
+.buttonsPane {
+    -fx-background-color: navy;    
+}
