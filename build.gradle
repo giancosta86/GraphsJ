@@ -138,9 +138,9 @@ moonLicense {
 
 
 task webstartCopyJars(type: Copy, dependsOn: 'installDist') {
-    from("${project.buildDir}/install/${project.name}")
-    into(webstartTempDir)
-    include('lib/*.jar')
+    from "${project.buildDir}/install/${project.name}"
+    into webstartTempDir
+    include 'lib/*.jar'
 }
 
 
@@ -221,4 +221,14 @@ task('webstart', dependsOn: 'webstartSign') << {
 }
 
 
-assemble.dependsOn('distZip', 'webstart')
+task('zipExamples', type: Zip) {
+    from 'examples'
+    include '*.gj3'
+
+
+    archiveName = 'GraphsJ_3_Examples.zip'
+    destinationDir = new File("${project.buildDir}/distributions")
+}
+
+
+assemble.dependsOn('distZip', 'webstart', 'zipExamples')
