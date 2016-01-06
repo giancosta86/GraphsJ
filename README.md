@@ -43,14 +43,25 @@ This new version, GraphsJ 3, is mainly oriented to a global refactoring of the s
 
 ## Requirements
 
-Java 8 or later is recommended in order to run GraphsJ or to use its SDK. 
+Java 8 or later is recommended in order to run GraphsJ or to use its SDK.
+
+
+
+## Running GraphsJ
+
+The suggested way to run GraphsJ is [MoonDeploy](https://github.com/giancosta86/moondeploy), as it will automatically download and launch the application - just go to the [latest release](https://github.com/giancosta86/GraphsJ/releases/latest) page and open the file **App.moondeploy**.
+
+Otherwise, to start the application:
+1. Download and decompress the zip archive
+2. Run the file *bin/GraphsJ* (on UNIX) or *bin/GraphsJ.bat* (on Windows)
+
 
 
 ## SDK
 
 GraphsJ SDK is a library providing classes and interfaces to easily create scenarios that you can import and run within GraphsJ.
 
-GraphsJ SDK consists of the following modules: 
+GraphsJ SDK consists of the following modules:
 
 
 * **graphsj-sdk**: provides classes and interfaces required to create your custom scenarios
@@ -60,7 +71,7 @@ GraphsJ SDK consists of the following modules:
 
 All the modules are available on [Hephaestus](https://bintray.com/giancosta86/Hephaestus) and can be declared as Gradle or Maven dependencies.
 
-**IMPORTANT**: all the modules provided by the SDK should be referenced as **provided** dependencies, because they are needed only during the compilation of your project, as they are provided by GraphsJ itself at runtime. 
+**IMPORTANT**: all the modules provided by the SDK should be referenced as **provided** dependencies, because they are needed only during the compilation of your project, as they are provided by GraphsJ itself at runtime.
 
 
 ## Online help
@@ -73,7 +84,7 @@ You can also consult the [pseudocode](https://github.com/giancosta86/GraphsJ/blo
 ## Examples
 
 A few example files are available, ready to run within GraphsJ:
- 
+
 [Download the example files](https://github.com/giancosta86/GraphsJ/releases/download/v3.7/GraphsJ_3_Examples.zip)
 
 
