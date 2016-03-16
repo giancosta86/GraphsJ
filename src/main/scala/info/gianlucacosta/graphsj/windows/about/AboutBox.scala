@@ -18,5 +18,26 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj.windows.about
 
+import javafx.fxml.FXMLLoader
+
+import info.gianlucacosta.graphsj.AppInfo
+
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.{Alert, ButtonBar, ButtonType}
+
+class AboutBox extends Alert(AlertType.None) {
+  title = s"About ${AppInfo.name}..."
+
+  dialogPane().setContent({
+    val loader = new FXMLLoader(getClass.getResource("AboutBox.fxml"))
+
+    loader.load[javafx.scene.layout.Pane]
+  })
+
+
+  buttonTypes = Seq(
+    new ButtonType("OK", ButtonBar.ButtonData.OKDone)
+  )
+}

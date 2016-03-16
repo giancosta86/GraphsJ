@@ -1,49 +1,43 @@
 # GraphsJ
 
-*Elegant and modern didactic application for running graph algorithms*
+*ScalaFX didactic application for running graph algorithms*
 
 
 ## Introduction
 
-GraphsJ is a modern didactic application dedicated to interactively execute graph algorithms; it features both a visual user interface and an SDK to develop *custom scenarios*.
+GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a visual user interface and a Scenario Development Kit - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
 
-Several students of Operations Research need to easily execute graph algorithms, in order to study them with a "hands-on" approach showing every step: GraphsJ meets this requirement by running, even step-by-step, some well-known algorithms - such as *Dijkstra's shortest path problem* - which often prove to be cross-subject.
+Students of Operations Research need to easily run graph algorithms, in order to study them with a practical, step-by-step approach: GraphsJ can meet this requirement for well-known algorithms - such as *Prim's Shortest Spanning Tree* - which often prove to be cross-subject.
 
-On the other hand, research workers want to test their algorithms on a PC, as it's faster and less error-prone, in particular if one wants to perform several tests. However, writing a whole computer program only to test an algorithm is not always at hand - just the creation a GUI is indeed a rather complex, time-consuming task.
+On the other hand, researchers may want to test their algorithms on a PC, as it's faster and less error-prone, especially as the number of tests increases; unfortunately, writing a whole computer program only to test an algorithm is not always at hand - just the creation a GUI is a rather complex, time-consuming task.
 
-GraphsJ satisfies both user groups, because it provides an easy-to-use interface as well as a simple Java framework: this means that anyone knowing just a bit of Java can create their own algorithms, without dealing with details such as the creation of a user interface or disk I/O - these features are already provided by the application, so the developer only has to create a few classes, compile them and provide the program with their location, therefore focusing on the business logic making up the algorithms.
+GraphsJ satisfies both user groups, providing an easy-to-use interface as well as a minimalist Scala framework: people can therefore focus on the business logic making up their algorithms.
 
-This new version, GraphsJ 3, is mainly oriented to a global refactoring of the software architecture, which is now much simplified and far more elegant; it is based on two open-source libraries developed by me - [Helios](https://github.com/giancosta86/Helios-core) and [Arcontes](https://github.com/giancosta86/Arcontes-core), as well as on a vast set of modern technologies, in particular JavaFX, in order to deliver an enhanced user experience.
+This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original architecture, introducing several concepts from Functional Programming; adding and removing scenarios is also extremely simplified: JAR files copied into a dedicated per-user directory will automatically and immediately provide new scenarios.
 
 
 ## Features
 
-* A modern user interface, based on JavaFX
+* *Modern user interface*, employing **ScalaFX**
 
-* Flexible and greatly enhanced canvas to draw and edit your graphs
+* *Flexible and vastly enhanced canvas* to draw and edit graphs
 
-* Includes 4 predefined, widely-used algorithms
+* ScalaFX-based **SDK**, enabling anyone to easily *create new scenarios*
 
-* Customizable fonts and colors for graph, vertexes and edges. Graphical settings are stored in each scenario file, along with the graph they describe
+* **Scenario-discovery engine**, *automatically adding and removing scenarios*
 
-* Java-based SDK, enabling anyone to easily create new scenarios to plug into the program
+* *Simplified model*, inspired by **Functional Programming**
 
-* Full source code available, especially for the standard algorithms: developers can create a new algorithm starting from a consolidated base
+* *Per-scenario options dialog and help*, customizable by scenario developers
 
-* Per-scenario options dialog and help page, customizable by scenario developers
+* **XML-based document files**, to foster *interoperability and compatibility with previous versions*
 
-* XML-based document files, to foster interoperability
-
-* New, redesigned and much more elegant architecture, based on [Helios](https://github.com/giancosta86/Helios-core) and [Arcontes](https://github.com/giancosta86/Arcontes-core).
-
-* Short but complete online help
-
-* Open source and, hopefully, elegant
+* **Open source** code available: developers can create a new scenario starting from a consolidated base
 
 
 ## Requirements
 
-Java 8 or later is recommended in order to run GraphsJ or to use its SDK.
+Java 8u65 or later is recommended.
 
 
 
@@ -55,56 +49,50 @@ Otherwise, to start the application:
 1. Download and decompress the zip archive
 2. Run the file *bin/GraphsJ* (on UNIX) or *bin/GraphsJ.bat* (on Windows)
 
+**Users already having GraphsJ 3 can just run the program: MoonDeploy will automatically update it to GraphsJ 4**
 
-
-## SDK
-
-GraphsJ SDK is a library providing classes and interfaces to easily create scenarios that you can import and run within GraphsJ.
-
-GraphsJ SDK consists of the following modules:
-
-
-* **graphsj-sdk**: provides classes and interfaces required to create your custom scenarios
-
-* **graphsj-algorithms**: contains the built-in algorithm classes, whose logic and results can be used within your own algorithms
-
-
-All the modules are available on [Hephaestus](https://bintray.com/giancosta86/Hephaestus) and can be declared as Gradle or Maven dependencies.
-
-**IMPORTANT**: all the modules provided by the SDK should be referenced as **provided** dependencies, because they are needed only during the compilation of your project, as they are provided by GraphsJ itself at runtime.
 
 
 ## Online help
 
-GraphsJ features a fairly easy-to-use interface, but you can find out more about its commands by looking at the online help, accessible by clicking the menu item *?->Help* within the program.
-
-You can also consult the [pseudocode](https://github.com/giancosta86/GraphsJ/blob/master/pseudocode.pdf) of the standard algorithms provided by the application.
+GraphsJ features a very user-friendly interface, but ideas and suggestions can be found in the [wiki](https://github.com/giancosta86/GraphsJ/wiki)!
 
 
-## Examples
 
-A few example files are available, ready to run within GraphsJ:
+## Scenario development kit
 
-[Download the example files](https://github.com/giancosta86/GraphsJ/releases/download/v3.7/GraphsJ_3_Examples.zip)
+For detailed information, please refer to the [SDK project page](https://github.com/giancosta86/GraphsJ-sdk).
+
+
+
+## Screenshots
+
+![Drawing](screenshots/Drawing.png)
+
+![Main window](screenshots/MainWindow.png)
+
+![Splash screen](screenshots/SplashScreen.png)
+
 
 
 ## Special thanks
 
-Most of the icons in the toolbar are a customization of the [Primo icon set](https://www.iconfinder.com/iconsets/Primo_Icons), by [Double-J Design](http://www.doublejdesign.co.uk/).
-
-Thanks to Paolo Tagliapietra for our interesting chats about architectural and domain-related aspects, as well as for beta testing.
-
+The icons in the menu and toolbar are part of the [Crystal Clear icon set](https://commons.wikimedia.org/wiki/Crystal_Clear), by [Everaldo Coelho](https://en.wikipedia.org/wiki/Everaldo_Coelho).
 
 Special thanks to:
 
 * [Professor Silvano Martello](http://www.or.deis.unibo.it/staff_pages/martello/cvitae.html)
 * [Claudia D'Ambrosio](http://www.or.deis.unibo.it/staff_pages/dambrosio/cv_claudia_english.htm)
 
-for their support and advice.
+for their suggestions.
 
 
 ## Further references
 
 * [Facebook page](https://www.facebook.com/graphsj)
-* [Helios](https://github.com/giancosta86/Helios-core)
-* [Arcontes](https://github.com/giancosta86/Helios-core)
+
+* [GraphsJ Scenario Development Kit](https://github.com/giancosta86/GraphsJ-sdk)
+
+* [GraphsJ - Scenarios](https://github.com/giancosta86/GraphsJ-scenarios)
+
+* [EighthBridge](https://github.com/giancosta86/EighthBridge)

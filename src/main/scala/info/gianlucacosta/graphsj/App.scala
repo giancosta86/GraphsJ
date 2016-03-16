@@ -18,5 +18,21 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj
 
+import javafx.application.Application
+import javafx.stage.Stage
+
+object App {
+  def main(args: Array[String]): Unit = {
+    Application.launch(classOf[App], args: _*)
+  }
+}
+
+class App extends Application {
+  override def start(primaryStage: Stage): Unit = {
+    new StartupThread(primaryStage) {
+      start()
+    }
+  }
+}

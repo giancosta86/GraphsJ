@@ -18,5 +18,9 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj.windows.main
 
+import info.gianlucacosta.eighthbridge.graphs.point2point.visual.VisualGraph
+import info.gianlucacosta.graphsj.Scenario
+
+private case class GraphDocument(scenario: Scenario, designGraph: VisualGraph)

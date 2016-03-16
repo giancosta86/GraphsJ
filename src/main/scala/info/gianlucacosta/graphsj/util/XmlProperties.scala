@@ -18,5 +18,28 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj.util
 
+import java.io.InputStream
+
+import scala.xml.XML
+
+
+/**
+  * Map-like structure initialized from a given standard XML properties file.
+  *
+  * @param sourceStream the source stream
+  */
+class XmlProperties(sourceStream: InputStream) {
+  private val propertyMap = {
+    val infoXml = XML.load(sourceStream)
+
+    (infoXml \ "entry").map(
+      propertyNode => (propertyNode \ "@key").text -> propertyNode.text
+    ).toMap
+  }
+
+  def apply(key: String): String = propertyMap(key)
+
+  override def toString: String = propertyMap.mkString("{", ",", "}")
+}

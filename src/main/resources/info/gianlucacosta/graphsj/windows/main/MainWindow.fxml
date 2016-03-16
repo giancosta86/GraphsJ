@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane id="BorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="449.0" prefWidth="669.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="info.gianlucacosta.graphsj.windows.main.MainWindowController">
+    <center>
+        <SplitPane fx:id="workspaceArea" dividerPositions="0.75" focusTraversable="true" orientation="VERTICAL"
+                   prefHeight="200.0" prefWidth="160.0">
+            <items>
+                <ScrollPane fx:id="graphCanvasPane" prefHeight="200.0" prefWidth="200.0"/>
+                <TextArea fx:id="consoleArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true"/>
+            </items>
+        </SplitPane>
+    </center>
+    <top>
+        <VBox>
+            <children>
+                <MenuBar fx:id="menuBar">
+                    <menus>
+                        <Menu fx:id="fileMenu" mnemonicParsing="false" style="" text="File">
+                            <items>
+                                <MenuItem fx:id="newMenuItem" mnemonicParsing="false" onAction="#newScenario" style=""
+                                          text="New..."/>
+                                <MenuItem fx:id="openMenuItem" mnemonicParsing="false" onAction="#openScenario"
+                                          text="Open..."/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" onAction="#saveScenario"
+                                          text="Save"/>
+                                <MenuItem fx:id="saveAsMenuItem" mnemonicParsing="false" onAction="#saveScenarioAs"
+                                          text="Save as..."/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#exitProgram"
+                                          text="Exit"/>
+                            </items>
+                        </Menu>
+                        <Menu fx:id="editMenu" mnemonicParsing="false" text="Edit">
+                            <items>
+                                <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#selectAll"
+                                          text="Select all"/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="canvasSizeMenuItem" mnemonicParsing="false"
+                                          onAction="#chooseCanvasSize" text="Canvas size..."/>
+                            </items>
+                        </Menu>
+                        <Menu fx:id="scenarioMenu" mnemonicParsing="false" text="Scenario">
+                            <items>
+                                <MenuItem fx:id="showScenarioNameMenuItem" mnemonicParsing="false"
+                                          onAction="#showScenarioName" text="Show name"/>
+                                <MenuItem fx:id="showScenarioHelpMenuItem" mnemonicParsing="false"
+                                          onAction="#showScenarioHelp" text="Show help"/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="showScenarioSettingsMenuItem" mnemonicParsing="false"
+                                          onAction="#showScenarioSettings" text="Settings..."/>
+                            </items>
+                        </Menu>
+                        <Menu fx:id="runMenu" mnemonicParsing="false" text="Run">
+                            <items>
+                                <MenuItem fx:id="fullRunMenuItem" mnemonicParsing="false" onAction="#run" text="Run"/>
+                                <MenuItem fx:id="runStepMenuItem" mnemonicParsing="false" onAction="#runStep"
+                                          text="Run step"/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="stopRunMenuItem" mnemonicParsing="false" onAction="#stopRun"
+                                          text="Stop run"/>
+                            </items>
+                        </Menu>
+                        <Menu fx:id="consoleMenu" mnemonicParsing="false" text="Console">
+                            <items>
+                                <MenuItem fx:id="saveConsoleAsMenuItem" mnemonicParsing="false"
+                                          onAction="#saveConsoleAs" text="Save as..."/>
+                                <MenuItem fx:id="clearConsoleMenuItem" mnemonicParsing="false" onAction="#clearConsole"
+                                          text="Clear"/>
+                            </items>
+                        </Menu>
+                        <Menu fx:id="settingsMenu" mnemonicParsing="false" text="Settings">
+                            <items>
+                                <MenuItem fx:id="showScenariosDirectoryMenuItem" mnemonicParsing="false"
+                                          onAction="#showScenariosDirectory" text="Show scenarios directory"/>
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="?">
+                            <items>
+                                <MenuItem fx:id="helpMenuItem" mnemonicParsing="false" onAction="#showHelp"
+                                          text="Help"/>
+                                <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#showAboutBox"
+                                          text="About..."/>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <ToolBar prefWidth="658.0">
+                    <items>
+                        <Button fx:id="newButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="openButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="saveButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="saveAsButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Separator orientation="VERTICAL"/>
+                        <Button fx:id="fullRunButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="runStepButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="stopRunButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Separator orientation="VERTICAL"/>
+                        <Button fx:id="helpButton" focusTraversable="false" mnemonicParsing="false"/>
+                        <Button fx:id="aboutButton" focusTraversable="false" mnemonicParsing="false"/>
+                    </items>
+                </ToolBar>
+            </children>
+        </VBox>
+    </top>
+</BorderPane>

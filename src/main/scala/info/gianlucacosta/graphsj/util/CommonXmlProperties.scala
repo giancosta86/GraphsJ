@@ -18,5 +18,22 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj.util
 
+import java.io.InputStream
+
+
+/**
+  * Extends XmlProperties by providing common, typed fields
+  *
+  * @param sourceStream the source stream
+  */
+class CommonXmlProperties(sourceStream: InputStream) extends XmlProperties(sourceStream) {
+  val name = this ("name")
+  val version = this ("version")
+  val copyrightYears = this ("copyrightYears")
+  val license = this ("license")
+  val website = this ("website")
+  val facebookPage = this ("facebookPage")
+  val release = this ("release").toBoolean
+}

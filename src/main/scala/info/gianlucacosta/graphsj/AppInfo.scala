@@ -18,5 +18,20 @@
   ===========================================================================
 */
 
-rootProject.name = 'GraphsJ'
+package info.gianlucacosta.graphsj
 
+import java.io.File
+
+import info.gianlucacosta.eighthbridge.util.DesktopUtils
+import info.gianlucacosta.graphsj.util.CommonXmlProperties
+
+object AppInfo extends CommonXmlProperties(
+  App.getClass.getResourceAsStream("App.properties.xml")
+) {
+  val DefaultExtension = ".gj4"
+
+  val ScenariosDirectory = new File(
+    DesktopUtils.homeDirectory.get,
+    "." + name
+  )
+}

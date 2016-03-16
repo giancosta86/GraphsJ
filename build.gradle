@@ -4,19 +4,17 @@
   ===========================================================================
   Copyright (C) 2009-2016 Gianluca Costa
   ===========================================================================
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+       http://www.apache.org/licenses/LICENSE-2.0
 
-  You should have received a copy of the GNU General Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
   ===========================================================================
 */
 
@@ -30,42 +28,39 @@ buildscript {
     }
 
     dependencies {
-        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
         classpath 'info.gianlucacosta.aurora:aurora:2.1'
+        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.0'
     }
 }
 
-
 import org.apache.tools.ant.filters.ReplaceTokens
 
-apply plugin: 'java'
-apply plugin: 'application'
+
+apply plugin: 'scala'
 apply plugin: 'info.gianlucacosta.aurora'
+apply plugin: 'application'
 
 
 group = 'info.gianlucacosta.graphsj'
 archivesBaseName = 'graphsj'
-version = '3.8'
+version = '4.0'
 
-description = 'Elegant and modern didactic application for running graph algorithms'
+description = 'ScalaFX didactic application for graph algorithms'
 
 project.ext.facebookPage = 'https://www.facebook.com/graphsj'
 
 
-mainClassName = "info.gianlucacosta.graphsj3.Main"
-
+mainClassName = "info.gianlucacosta.graphsj.App"
 
 
 dependencies {
-    compile 'info.gianlucacosta.helios:helios-xml:1.7'
-    compile 'info.gianlucacosta.helios:helios-spring:1.7'
-    compile 'info.gianlucacosta.graphsj:graphsj-algorithms:3.5'
-    compile 'log4j:log4j:1.2.17'
+    compile 'info.gianlucacosta.graphsj:graphsj-sdk:4.0'
 
-    runtime 'org.slf4j:slf4j-log4j12:1.7.2'
+    compile 'org.scala-lang:scala-xml:2.11.0-M4'
+    compile 'com.thoughtworks.xstream:xstream:1.4.8'
+    compile 'org.reflections:reflections:0.9.10'
 }
-
 
 
 processResources {
@@ -83,6 +78,7 @@ processResources {
 }
 
 
+
 startScripts {
     def originalWindowsTemplateString = windowsStartScriptGenerator.template.asString()
     def javawTemplateString =
@@ -94,9 +90,8 @@ startScripts {
 }
 
 
-
 aurora {
-    docTask = 'javadoc'
+    docTask = 'scaladoc'
     gitHubUser = 'giancosta86'
 
     author {
@@ -109,28 +104,18 @@ aurora {
         user = project.bintrayUser
         key = project.bintrayKey
         repo = 'Hephaestus'
-        licenses = ['GPL-3.0']
-        labels = ['GraphsJ', 'graphs', 'didactic', 'application', 'Java']
+        licenses = ['Apache-2.0']
+        labels = ['GraphsJ', 'graphs', 'didactic', 'application', 'Java', 'Scala', 'JavaFX', 'ScalaFX']
     }
 }
 
 
 moonLicense {
-    license = gpl3
+    license = apache2
 
     productInfo {
         productName = 'GraphsJ'
         inceptionYear = 2009
         copyrightHolder = 'Gianluca Costa'
     }
-}
-
-
-task('zipExamples', type: Zip) {
-    from 'examples'
-    include '*.gj3'
-
-
-    archiveName = 'GraphsJ_3_Examples.zip'
-    destinationDir = new File("${project.buildDir}/distributions")
 }
