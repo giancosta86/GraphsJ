@@ -34,4 +34,10 @@ object AppInfo extends CommonXmlProperties(
     DesktopUtils.homeDirectory.get,
     "." + name
   )
+
+  def ensureScenariosDirectory(): Unit = {
+    if (!ScenariosDirectory.isDirectory && !ScenariosDirectory.mkdirs()) {
+      throw new RuntimeException(s"Cannot create the scenarios directory:\n'${ScenariosDirectory}'")
+    }
+  }
 }

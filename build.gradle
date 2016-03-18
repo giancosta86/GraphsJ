@@ -44,7 +44,7 @@ apply plugin: 'application'
 
 group = 'info.gianlucacosta.graphsj'
 archivesBaseName = 'graphsj'
-version = '4.0'
+version = '4.1'
 
 description = 'ScalaFX didactic application for graph algorithms'
 
@@ -60,6 +60,8 @@ dependencies {
     compile 'org.scala-lang:scala-xml:2.11.0-M4'
     compile 'com.thoughtworks.xstream:xstream:1.4.8'
     compile 'org.reflections:reflections:0.9.10'
+    compile 'javax.json:javax.json-api:1.0'
+    compile 'org.glassfish:javax.json:1.0.4'
 }
 
 

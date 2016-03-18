@@ -5,6 +5,8 @@
 
 ## Introduction
 
+![Prim's Shortest Spanning Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/BasicPrimSST.png)
+
 GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a visual user interface and a Scenario Development Kit - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
 
 Students of Operations Research need to easily run graph algorithms, in order to study them with a practical, step-by-step approach: GraphsJ can meet this requirement for well-known algorithms - such as *Prim's Shortest Spanning Tree* - which often prove to be cross-subject.
@@ -14,6 +16,8 @@ On the other hand, researchers may want to test their algorithms on a PC, as it'
 GraphsJ satisfies both user groups, providing an easy-to-use interface as well as a minimalist Scala framework: people can therefore focus on the business logic making up their algorithms.
 
 This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original architecture, introducing several concepts from Functional Programming; adding and removing scenarios is also extremely simplified: JAR files copied into a dedicated per-user directory will automatically and immediately provide new scenarios.
+
+Finally, when no scenarios are installed, GraphsJ can automatically download the latest version of its scenarios pack directly from GitHub! ^\_\_^
 
 
 ## Features
@@ -25,6 +29,8 @@ This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original arch
 * ScalaFX-based **SDK**, enabling anyone to easily *create new scenarios*
 
 * **Scenario-discovery engine**, *automatically adding and removing scenarios*
+
+* **Automated installation of the predefined scenarios**, retrieved from [GraphsJ-scenarios](https://github.com/giancosta86/GraphsJ-scenarios)
 
 * *Simplified model*, inspired by **Functional Programming**
 
@@ -49,7 +55,7 @@ Otherwise, to start the application:
 1. Download and decompress the zip archive
 2. Run the file *bin/GraphsJ* (on UNIX) or *bin/GraphsJ.bat* (on Windows)
 
-**Users already having GraphsJ 3 can just run the program: MoonDeploy will automatically update it to GraphsJ 4**
+**Users who installed GraphsJ 3 via MoonDeploy can just run the program: MoonDeploy will automatically update it to GraphsJ 4**.
 
 
 
@@ -73,6 +79,7 @@ For detailed information, please refer to the [SDK project page](https://github.
 
 ![Splash screen](screenshots/SplashScreen.png)
 
+![Installing scenarios](screenshots/InstallingScenarios.png)
 
 
 ## Special thanks

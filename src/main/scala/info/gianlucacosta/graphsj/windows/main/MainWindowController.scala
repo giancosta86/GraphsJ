@@ -21,14 +21,21 @@
 package info.gianlucacosta.graphsj.windows.main
 
 import java.io._
+import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.util.concurrent.Callable
+import java.util.function.{Consumer, Predicate}
+import java.util.regex.Pattern
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.fxml.FXML
+import javafx.scene.Node
+import javafx.scene.control.Label
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.Region
+import javax.json.{Json, JsonObject}
 
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.converters.ConversionException
@@ -38,17 +45,23 @@ import info.gianlucacosta.eighthbridge.graphs.point2point.visual.VisualGraph
 import info.gianlucacosta.eighthbridge.util.DesktopUtils
 import info.gianlucacosta.eighthbridge.util.fx.dialogs.{Alerts, InputDialogs}
 import info.gianlucacosta.graphsj._
+import info.gianlucacosta.graphsj.windows.BusyDialog
 import info.gianlucacosta.graphsj.windows.about.AboutBox
 
+import scala.collection.JavaConversions._
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.geometry.Dimension2D
+import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.stage.{FileChooser, Stage, WindowEvent}
 
 
 class MainWindowController {
+  private val PredefinedScenariosJarFileNameRegex = Pattern.compile(raw"graphsj-scenarios-\d+(?:[\d\.]+)\.jar")
+
   private var xstream: XStream = _
 
   private val scenarioRepositoryLock = new Object
@@ -324,8 +337,49 @@ class MainWindowController {
     }
 
     if (_scenarioRepository.scenarios.isEmpty) {
-      Alerts.showWarning(s"${AppInfo.name} requires at least one scenario.\n\nPlease, download one or more .jar files providing scenarios and copy them to the scenarios directory.")
-      showScenariosDirectory()
+      val installPredefinedScenariosButton = new ButtonType("Install predefined scenarios")
+      val showScenariosDirectoryButton = new ButtonType("Show scenarios directory")
+
+      val noScenariosAlert = new Alert(AlertType.Confirmation) {
+        initOwner(stage())
+        headerText = "No scenarios installed"
+        contentText = (
+          s"${AppInfo.name} requires at least one scenario.\n\n"
+            + s"${AppInfo.name} can automatically install the predefined scenario pack; alternatively, "
+            + "you can download one or more .jar files providing scenarios and copy them "
+            + "to the scenarios directory."
+          )
+
+        buttonTypes = Seq(
+          installPredefinedScenariosButton,
+          showScenariosDirectoryButton,
+          ButtonType.Cancel
+        )
+
+        dialogPane()
+          .getChildren
+          .filtered(new Predicate[Node] {
+            override def test(node: Node): Boolean = node.isInstanceOf[Label]
+          })
+          .forEach(new Consumer[Node] {
+            override def accept(node: Node): Unit = {
+              node.asInstanceOf[Label].setMinHeight(Region.USE_PREF_SIZE)
+            }
+          })
+      }
+
+      val noScenariosResolutionInput = noScenariosAlert.showAndWait()
+
+      noScenariosResolutionInput match {
+        case Some(`installPredefinedScenariosButton`) =>
+          installPredefinedScenarios()
+
+        case Some(`showScenariosDirectoryButton`) =>
+          showScenariosDirectory()
+
+        case _ =>
+      }
+
       return
     }
 
@@ -357,6 +411,97 @@ class MainWindowController {
         Alerts.showException(ex)
 
         ex.printStackTrace(System.err)
+    }
+  }
+
+
+  def installPredefinedScenarios(): Unit = {
+    AppInfo.ensureScenariosDirectory()
+
+    try {
+      val existingScenariosJarFile = AppInfo.ScenariosDirectory
+        .listFiles()
+        .find(file =>
+          PredefinedScenariosJarFileNameRegex.matcher(file.getName).matches()
+        )
+
+
+      if (existingScenariosJarFile.nonEmpty) {
+        val reinstallInput = InputDialogs.askYesNoCancel(
+          "The predefined scenarios are already installed.\n\nDo you wish to reinstall them?",
+          s"${AppInfo.name} - Scenarios"
+        )
+
+        if (!reinstallInput.contains(true)) {
+          return
+        }
+
+        if (!existingScenariosJarFile.get.delete()) {
+          throw new RuntimeException(s"Cannot delete the predefined scenarios file:\n'${existingScenariosJarFile.get.getAbsolutePath}'")
+        }
+      }
+
+      val busyDialog = new BusyDialog(
+        stage(),
+        "Installing scenarios..."
+      ) {
+        run {
+          downloadPredefinedScenariosJar()
+        }
+      }
+    } catch {
+      case ex: Exception =>
+        Alerts.showException(ex)
+    }
+  }
+
+  private def downloadPredefinedScenariosJar(): Unit = {
+    val scenariosApiUrl =
+      new URL("https://api.github.com/repos/giancosta86/GraphsJ-scenarios/releases/latest")
+
+    val scenariosApiJsonReader = Json.createReader(scenariosApiUrl.openStream())
+
+    try {
+      val scenariosApiJson = scenariosApiJsonReader.readObject()
+
+      val assets = scenariosApiJson.getJsonArray("assets")
+
+      assets.foreach(asset => {
+        val assetObject = asset.asInstanceOf[JsonObject]
+        val assetName = assetObject.getString("name")
+
+        val isScenariosJarAsset = PredefinedScenariosJarFileNameRegex.matcher(assetName).matches()
+
+        if (isScenariosJarAsset) {
+          val targetFile = new File(AppInfo.ScenariosDirectory, assetName)
+
+          val sourceUrl = new URL(assetObject.getString("browser_download_url"))
+
+          val sourceStream = sourceUrl.openStream()
+          try {
+            Files.copy(sourceStream, targetFile.toPath)
+          } finally {
+            sourceStream.close()
+          }
+
+          Platform.runLater {
+            Alerts.showInfo("The predefined scenarios have been installed.", s"${AppInfo.name} - Scenarios")
+          }
+        }
+      })
+    } finally {
+      scenariosApiJsonReader.close()
+    }
+  }
+
+
+  def showScenariosDirectory(): Unit = {
+    try {
+      AppInfo.ensureScenariosDirectory()
+      DesktopUtils.openFile(AppInfo.ScenariosDirectory)
+    } catch {
+      case ex: Exception =>
+        Alerts.showException(ex)
     }
   }
 
@@ -617,17 +762,6 @@ class MainWindowController {
   }
 
 
-  def showScenariosDirectory(): Unit = {
-    AppInfo.ScenariosDirectory.mkdirs()
-
-    if (AppInfo.ScenariosDirectory.isDirectory) {
-      DesktopUtils.openFile(AppInfo.ScenariosDirectory)
-    } else {
-      Alerts.showError(s"Cannot create the scenarios directory:\n\n'${AppInfo.ScenariosDirectory}'")
-    }
-  }
-
-
   def showHelp(): Unit = {
     DesktopUtils.openBrowser(AppInfo.website)
   }
@@ -678,6 +812,10 @@ class MainWindowController {
 
   @FXML
   protected var stopRunMenuItem: javafx.scene.control.MenuItem = _
+
+
+  @FXML
+  protected var installPredefinedScenariosMenuItem: javafx.scene.control.MenuItem = _
 
 
   @FXML

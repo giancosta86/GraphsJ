@@ -73,13 +73,18 @@ private class StartupThread(primaryStage: Stage) extends Thread {
     val mainWindowController = loader.getController.asInstanceOf[MainWindowController]
     mainWindowController.stage() = primaryStage
 
-    AppInfo.ScenariosDirectory.mkdirs()
-    if (!AppInfo.ScenariosDirectory.isDirectory) {
-      Platform.runLater {
-        Alerts.showError(s"Cannot create the scenarios directory:\n'${AppInfo.ScenariosDirectory}'")
-        System.exit(1)
-      }
+
+    try {
+      AppInfo.ensureScenariosDirectory()
+    } catch {
+      case ex: Exception =>
+        Platform.runLater {
+          Alerts.showError(ex.getMessage)
+          System.exit(1)
+        }
     }
+
+
     mainWindowController.scenarioRepository = new ScenarioRepository(AppInfo.ScenariosDirectory)
 
     new ScenariosDirectoryWatcher(mainWindowController, AppInfo.ScenariosDirectory) {
