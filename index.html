@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="GraphsJ : ScalaFX didactic application for graph algorithms">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>GraphsJ</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/giancosta86/GraphsJ">View on GitHub</a>
+
+          <h1 id="project_title">GraphsJ</h1>
+          <h2 id="project_tagline">ScalaFX didactic application for graph algorithms</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/giancosta86/GraphsJ/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/giancosta86/GraphsJ/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="graphsj" class="anchor" href="#graphsj" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GraphsJ</h1>
+
+<p><em>ScalaFX didactic application for running graph algorithms</em></p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p><img src="https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/BasicPrimSST.png" alt="Prim's Shortest Spanning Tree"></p>
+
+<p>GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a visual user interface and a Scenario Development Kit - to create <em>custom scenarios</em> based on the <a href="https://github.com/giancosta86/EighthBridge">EighthBridge</a> toolkit for ScalaFX.</p>
+
+<p>Students of Operations Research need to easily run graph algorithms, in order to study them with a practical, step-by-step approach: GraphsJ can meet this requirement for well-known algorithms - such as <em>Prim's Shortest Spanning Tree</em> - which often prove to be cross-subject.</p>
+
+<p>On the other hand, researchers may want to test their algorithms on a PC, as it's faster and less error-prone, especially as the number of tests increases; unfortunately, writing a whole computer program only to test an algorithm is not always at hand - just the creation a GUI is a rather complex, time-consuming task.</p>
+
+<p>GraphsJ satisfies both user groups, providing an easy-to-use interface as well as a minimalist Scala framework: people can therefore focus on the business logic making up their algorithms.</p>
+
+<p>This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original architecture, introducing several concepts from Functional Programming; adding and removing scenarios is also extremely simplified: JAR files copied into a dedicated per-user directory will automatically and immediately provide new scenarios.</p>
+
+<p>Finally, when no scenarios are installed, GraphsJ can automatically download the latest version of its scenarios pack directly from GitHub! ^__^</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li><p><em>Modern user interface</em>, employing <strong>ScalaFX</strong></p></li>
+<li><p><em>Flexible and vastly enhanced canvas</em> to draw and edit graphs</p></li>
+<li><p>ScalaFX-based <strong>SDK</strong>, enabling anyone to easily <em>create new scenarios</em></p></li>
+<li><p><strong>Scenario-discovery engine</strong>, <em>automatically adding and removing scenarios</em></p></li>
+<li><p><strong>Automated installation of the predefined scenarios</strong>, retrieved from <a href="https://github.com/giancosta86/GraphsJ-scenarios">GraphsJ-scenarios</a></p></li>
+<li><p><em>Simplified model</em>, inspired by <strong>Functional Programming</strong></p></li>
+<li><p><em>Per-scenario options dialog and help</em>, customizable by scenario developers</p></li>
+<li><p><strong>XML-based document files</strong>, to foster <em>interoperability and compatibility with previous versions</em></p></li>
+<li><p><strong>Open source</strong> code available: developers can create a new scenario starting from a consolidated base</p></li>
+</ul>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>Java 8u65 or later is recommended.</p>
+
+<h2>
+<a id="running-graphsj" class="anchor" href="#running-graphsj" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running GraphsJ</h2>
+
+<p>The suggested way to run GraphsJ is <a href="https://github.com/giancosta86/moondeploy">MoonDeploy</a>, as it will automatically download and launch the application - just click "Run with MoonDeploy".</p>
+
+<p>Otherwise, to start the application:
+1. Download and decompress the binary zip archive
+2. Run the file <em>bin/GraphsJ</em> (on UNIX) or <em>bin/GraphsJ.bat</em> (on Windows)</p>
+
+<h2>
+<a id="online-help" class="anchor" href="#online-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Online help</h2>
+
+<p>GraphsJ features a very user-friendly interface, but ideas and suggestions can be found in the <a href="https://github.com/giancosta86/GraphsJ/wiki">wiki</a>!</p>
+
+<h2>
+<a id="scenario-development-kit" class="anchor" href="#scenario-development-kit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Scenario development kit</h2>
+
+<p>For detailed information, please refer to the <a href="https://github.com/giancosta86/GraphsJ-sdk">SDK project page</a>.</p>
+
+<h2>
+<a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screenshots</h2>
+
+<p><img src="screenshots/Drawing.png" alt="Drawing"></p>
+
+<p><img src="screenshots/MainWindow.png" alt="Main window"></p>
+
+<p><img src="screenshots/SplashScreen.png" alt="Splash screen"></p>
+
+<p><img src="screenshots/InstallingScenarios.png" alt="Installing scenarios"></p>
+
+<h2>
+<a id="special-thanks" class="anchor" href="#special-thanks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Special thanks</h2>
+
+<p>The icons in the menu and toolbar are part of the <a href="https://commons.wikimedia.org/wiki/Crystal_Clear">Crystal Clear icon set</a>, by <a href="https://en.wikipedia.org/wiki/Everaldo_Coelho">Everaldo Coelho</a>.</p>
+
+<p>Special thanks to:</p>
+
+<ul>
+<li><a href="http://www.or.deis.unibo.it/staff_pages/martello/cvitae.html">Professor Silvano Martello</a></li>
+<li><a href="http://www.or.deis.unibo.it/staff_pages/dambrosio/cv_claudia_english.htm">Claudia D'Ambrosio</a></li>
+</ul>
+
+<p>for their suggestions.</p>
+
+<h2>
+<a id="further-references" class="anchor" href="#further-references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Further references</h2>
+
+<ul>
+<li><p><a href="https://www.facebook.com/graphsj">Facebook page</a></p></li>
+<li><p><a href="https://github.com/giancosta86/GraphsJ-sdk">GraphsJ Scenario Development Kit</a></p></li>
+<li><p><a href="https://github.com/giancosta86/GraphsJ-scenarios">GraphsJ - Scenarios</a></p></li>
+<li><p><a href="https://github.com/giancosta86/EighthBridge">EighthBridge</a></p></li>
+<li><p><a href="http://gianlucacosta.info/moondeploy">MoonDeploy</a></p></li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">GraphsJ maintained by <a href="https://github.com/giancosta86">giancosta86</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
