@@ -1,0 +1,5 @@
+/.gradle/**
+/build/**
+/.idea/**
+/*.iml
+/src/main/scala/info/gianlucacosta/graphsj/ArtifactInfo.scala
