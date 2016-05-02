@@ -89,7 +89,7 @@ The icons in the menu and toolbar are part of the [Crystal Clear icon set](https
 Special thanks to:
 
 * [Professor Silvano Martello](http://www.or.deis.unibo.it/staff_pages/martello/cvitae.html)
-* [Claudia D'Ambrosio](http://www.or.deis.unibo.it/staff_pages/dambrosio/cv_claudia_english.htm)
+* [Dott. Claudia D'Ambrosio](http://www.lix.polytechnique.fr/~dambrosio/)
 
 for their suggestions.
 
