@@ -18,22 +18,23 @@
   ===========================================================================
 */
 
-package info.gianlucacosta.graphsj.util
+package info.gianlucacosta.graphsj
 
-import java.io.InputStream
+import java.io.File
 
+import info.gianlucacosta.eighthbridge.util.DesktopUtils
 
-/**
-  * Extends XmlProperties by providing common, typed fields
-  *
-  * @param sourceStream the source stream
-  */
-class CommonXmlProperties(sourceStream: InputStream) extends XmlProperties(sourceStream) {
-  val name = this ("name")
-  val version = this ("version")
-  val copyrightYears = this ("copyrightYears")
-  val license = this ("license")
-  val website = this ("website")
-  val facebookPage = this ("facebookPage")
-  val release = this ("release").toBoolean
+object AppParams {
+  val DefaultExtension = ".gj4"
+
+  val ScenariosDirectory = new File(
+    DesktopUtils.homeDirectory.get,
+    "." + ArtifactInfo.name
+  )
+
+  def ensureScenariosDirectory(): Unit = {
+    if (!ScenariosDirectory.isDirectory && !ScenariosDirectory.mkdirs()) {
+      throw new RuntimeException(s"Cannot create the scenarios directory:\n'${ScenariosDirectory}'")
+    }
+  }
 }

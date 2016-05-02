@@ -28,90 +28,41 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
-        classpath 'info.gianlucacosta.aurora:aurora:2.1'
-        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.0'
-        classpath 'info.gianlucacosta.moondeploy:moondeploy-gradle:3.0'
+        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.1'
+        classpath 'info.gianlucacosta.moondeploy:moondeploy-gradle:3.2'
+        classpath 'info.gianlucacosta.aurora:aurora:4.3'
     }
 }
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
 
 apply plugin: 'scala'
-apply plugin: 'info.gianlucacosta.aurora'
-apply plugin: 'info.gianlucacosta.moondeploy'
 apply plugin: 'application'
+apply plugin: 'info.gianlucacosta.moonlicense'
+apply plugin: 'info.gianlucacosta.moondeploy'
+apply plugin: 'info.gianlucacosta.aurora'
 
 
 group = 'info.gianlucacosta.graphsj'
 archivesBaseName = 'graphsj'
-version = '4.1'
+version = '4.2'
 
 description = 'ScalaFX didactic application for graph algorithms'
 
 project.ext.facebookPage = 'https://www.facebook.com/graphsj'
 
-
 mainClassName = "info.gianlucacosta.graphsj.App"
 
 
 dependencies {
-    compile 'info.gianlucacosta.graphsj:graphsj-sdk:4.0'
-
     compile 'org.scala-lang:scala-xml:2.11.0-M4'
     compile 'com.thoughtworks.xstream:xstream:1.4.8'
     compile 'org.reflections:reflections:0.9.10'
     compile 'javax.json:javax.json-api:1.0'
     compile 'org.glassfish:javax.json:1.0.4'
+
+    compile 'info.gianlucacosta.graphsj:graphsj-sdk:4.1'
 }
 
-
-processResources {
-    filesMatching('**/App.properties.xml') {
-        filter ReplaceTokens, tokens: [
-                'name'          : project.name,
-                'version'       : project.version,
-                'copyrightYears': project.moonLicense.getCopyrightYears(),
-                'license'       : project.moonLicense.license.name,
-                'url'           : project.url.toString(),
-                'facebookPage'  : project.facebookPage,
-                'release'       : project.auroraSettings.release.toString()
-        ]
-    }
-}
-
-
-
-startScripts {
-    def originalWindowsTemplateString = windowsStartScriptGenerator.template.asString()
-    def javawTemplateString =
-            originalWindowsTemplateString
-                    .replace("java.exe", "javaw.exe")
-                    .replace("\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS%", "start \"\" /B \"%JAVA_EXE%\" %DEFAULT_JVM_OPTS%")
-    def javawTemplate = project.resources.text.fromString(javawTemplateString)
-    windowsStartScriptGenerator.template = javawTemplate
-}
-
-
-aurora {
-    docTask = 'scaladoc'
-    gitHubUser = 'giancosta86'
-
-    author {
-        name = 'Gianluca Costa'
-        email = 'gianluca@gianlucacosta.info'
-        url = 'http://gianlucacosta.info/'
-    }
-
-    bintray {
-        user = project.bintrayUser
-        key = project.bintrayKey
-        repo = 'Hephaestus'
-        licenses = ['Apache-2.0']
-        labels = ['GraphsJ', 'graphs', 'didactic', 'application', 'Java', 'Scala', 'JavaFX', 'ScalaFX']
-    }
-}
 
 
 moonLicense {
@@ -125,39 +76,19 @@ moonLicense {
 }
 
 
+aurora {
+    gitHubUser = 'giancosta86'
 
-task createAppDescriptor {
-    dependsOn(distZip)
-} << {
-  ant.moonDeploy(
-    baseURL: "${project.url}/releases/latest",
+    author {
+        name = 'Gianluca Costa'
+        email = 'gianluca@gianlucacosta.info'
+        url = 'http://gianlucacosta.info/'
+    }
 
-    name: "GraphsJ",
-    version: project.version,
-
-    description: project.description,
-    publisher: "Gianluca Costa",
-
-    skipPackageLevels: 1,
-
-    iconPath: "mainIcon.png"
-    ) {
-      commandLine {
-        param("bash")
-        param("bin/GraphsJ")
-      }
-
-      pkg(name: "GraphsJ-${project.version}.zip")
-
-      os(
-        name: "windows",
-        iconPath: "mainIcon.ico"
-      ) {
-        commandLine {
-          param("bin\\GraphsJ.bat")
-        }
-      }
+    javaVersion {
+      major = 1
+      minor = 8
+      build = 0
+      update = 65
     }
 }
-
-tasks["assemble"].dependsOn("createAppDescriptor")

@@ -23,7 +23,7 @@ package info.gianlucacosta.graphsj.windows.about
 import javafx.fxml.FXML
 
 import info.gianlucacosta.eighthbridge.util.DesktopUtils
-import info.gianlucacosta.graphsj.AppInfo
+import info.gianlucacosta.graphsj.{ArtifactInfo=>AppInfo}
 
 class AboutBoxController {
   def initialize {

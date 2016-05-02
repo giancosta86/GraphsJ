@@ -75,7 +75,7 @@ private class StartupThread(primaryStage: Stage) extends Thread {
 
 
     try {
-      AppInfo.ensureScenariosDirectory()
+      AppParams.ensureScenariosDirectory()
     } catch {
       case ex: Exception =>
         Platform.runLater {
@@ -85,9 +85,9 @@ private class StartupThread(primaryStage: Stage) extends Thread {
     }
 
 
-    mainWindowController.scenarioRepository = new ScenarioRepository(AppInfo.ScenariosDirectory)
+    mainWindowController.scenarioRepository = new ScenarioRepository(AppParams.ScenariosDirectory)
 
-    new ScenariosDirectoryWatcher(mainWindowController, AppInfo.ScenariosDirectory) {
+    new ScenariosDirectoryWatcher(mainWindowController, AppParams.ScenariosDirectory) {
       start()
     }
 

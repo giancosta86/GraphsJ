@@ -47,6 +47,7 @@ import info.gianlucacosta.eighthbridge.util.fx.dialogs.{Alerts, InputDialogs}
 import info.gianlucacosta.graphsj._
 import info.gianlucacosta.graphsj.windows.BusyDialog
 import info.gianlucacosta.graphsj.windows.about.AboutBox
+import info.gianlucacosta.graphsj.{ArtifactInfo=>AppInfo}
 
 import scala.collection.JavaConversions._
 import scalafx.Includes._
@@ -216,7 +217,7 @@ class MainWindowController {
     val fileChooser = new FileChooser
 
     fileChooser.extensionFilters.setAll(
-      new FileChooser.ExtensionFilter("Scenario", s"*${AppInfo.DefaultExtension}")
+      new FileChooser.ExtensionFilter("Scenario", s"*${AppParams.DefaultExtension}")
     )
 
     fileChooser.title = AppInfo.name
@@ -416,10 +417,10 @@ class MainWindowController {
 
 
   def installPredefinedScenarios(): Unit = {
-    AppInfo.ensureScenariosDirectory()
+    AppParams.ensureScenariosDirectory()
 
     try {
-      val existingScenariosJarFile = AppInfo.ScenariosDirectory
+      val existingScenariosJarFile = AppParams.ScenariosDirectory
         .listFiles()
         .find(file =>
           PredefinedScenariosJarFileNameRegex.matcher(file.getName).matches()
@@ -473,7 +474,7 @@ class MainWindowController {
         val isScenariosJarAsset = PredefinedScenariosJarFileNameRegex.matcher(assetName).matches()
 
         if (isScenariosJarAsset) {
-          val targetFile = new File(AppInfo.ScenariosDirectory, assetName)
+          val targetFile = new File(AppParams.ScenariosDirectory, assetName)
 
           val sourceUrl = new URL(assetObject.getString("browser_download_url"))
 
@@ -497,8 +498,8 @@ class MainWindowController {
 
   def showScenariosDirectory(): Unit = {
     try {
-      AppInfo.ensureScenariosDirectory()
-      DesktopUtils.openFile(AppInfo.ScenariosDirectory)
+      AppParams.ensureScenariosDirectory()
+      DesktopUtils.openFile(AppParams.ScenariosDirectory)
     } catch {
       case ex: Exception =>
         Alerts.showException(ex)
@@ -575,8 +576,8 @@ class MainWindowController {
       return false
     }
 
-    val actualFile = if (!selectedFile.getName.endsWith(AppInfo.DefaultExtension)) {
-      new File(selectedFile.getAbsolutePath + AppInfo.DefaultExtension)
+    val actualFile = if (!selectedFile.getName.endsWith(AppParams.DefaultExtension)) {
+      new File(selectedFile.getAbsolutePath + AppParams.DefaultExtension)
     } else {
       selectedFile
     }
