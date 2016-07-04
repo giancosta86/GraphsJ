@@ -7,10 +7,11 @@
             prefHeight="449.0" prefWidth="669.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="info.gianlucacosta.graphsj.windows.main.MainWindowController">
     <center>
-        <SplitPane fx:id="workspaceArea" dividerPositions="0.75" focusTraversable="true" orientation="VERTICAL"
+        <SplitPane fx:id="workspaceArea" dividerPositions="0.85" focusTraversable="true" orientation="VERTICAL"
                    prefHeight="200.0" prefWidth="160.0">
             <items>
-                <ScrollPane fx:id="graphCanvasPane" prefHeight="200.0" prefWidth="200.0"/>
+                <ScrollPane fx:id="graphCanvasPane" prefHeight="200.0" prefWidth="200.0" hbarPolicy="AS_NEEDED"
+                            vbarPolicy="AS_NEEDED"/>
                 <TextArea fx:id="consoleArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true"/>
             </items>
         </SplitPane>
@@ -32,6 +33,10 @@
                                 <MenuItem fx:id="saveAsMenuItem" mnemonicParsing="false" onAction="#saveScenarioAs"
                                           text="Save as..."/>
                                 <SeparatorMenuItem mnemonicParsing="false"/>
+                                <MenuItem fx:id="exportAsImageMenuItem" mnemonicParsing="false"
+                                          onAction="#exportCurrentGraphAsImage"
+                                          text="Export as image..."/>
+                                <SeparatorMenuItem mnemonicParsing="false"/>
                                 <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#exitProgram"
                                           text="Exit"/>
                             </items>
@@ -40,9 +45,6 @@
                             <items>
                                 <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#selectAll"
                                           text="Select all"/>
-                                <SeparatorMenuItem mnemonicParsing="false"/>
-                                <MenuItem fx:id="canvasSizeMenuItem" mnemonicParsing="false"
-                                          onAction="#chooseCanvasSize" text="Canvas size..."/>
                             </items>
                         </Menu>
                         <Menu fx:id="scenarioMenu" mnemonicParsing="false" text="Scenario">

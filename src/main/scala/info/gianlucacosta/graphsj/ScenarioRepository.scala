@@ -38,32 +38,39 @@ class ScenarioRepository(baseDirectory: File) {
     else
       Array[File]()
 
+
   val scenariosClassLoader = new URLClassLoader(
     jarFiles.map(_.toURI.toURL),
     getClass.getClassLoader
   )
 
-  val scenarios =
+
+  val scenarioFactories =
     jarFiles
-      .flatMap(jarFile => {
-
+      .flatMap(jarFile =>
         try {
-          val configuration = new ConfigurationBuilder()
-            .addClassLoader(scenariosClassLoader)
-            .setUrls(jarFile.toURI.toURL)
+          val configuration =
+            new ConfigurationBuilder()
+              .addClassLoader(scenariosClassLoader)
+              .setUrls(jarFile.toURI.toURL)
 
-
-          val reflections = new Reflections(configuration)
+          val reflections =
+            new Reflections(configuration)
 
           reflections
-            .getSubTypesOf(classOf[Scenario])
-            .filter(scenarioClass => !Modifier.isAbstract(scenarioClass.getModifiers) && !scenarioClass.isInterface)
-            .map(scenarioClass => scenarioClass.newInstance())
+            .getSubTypesOf(classOf[ScenarioFactory[_, _, _]])
+            .filter(scenarioFactoryClass =>
+              !Modifier.isAbstract(scenarioFactoryClass.getModifiers) &&
+                !scenarioFactoryClass.isInterface
+            )
+            .map(scenarioFactoryClass =>
+              scenarioFactoryClass.newInstance()
+            )
         } catch {
           case ex: Exception =>
             ex.printStackTrace(System.err)
             List()
         }
-      })
-      .sortBy(_.name)
+      )
+      .sortBy(_.scenarioName)
 }

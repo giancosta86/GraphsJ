@@ -1,36 +1,45 @@
 # GraphsJ
 
-*ScalaFX didactic application for running graph algorithms*
+*ScalaFX didactic application for graph algorithms*
+
+
+![Add/Delete GraphPlan](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/AdGraphPlan.png)
 
 
 ## Introduction
 
-![Prim's Shortest Spanning Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/BasicPrimSST.png)
+GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a ScalaFX visual user interface and a [Scenario Development Kit](https://github.com/giancosta86/GraphsJ-sdk) - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
 
-GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a visual user interface and a Scenario Development Kit - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
+Starting from version 5.0, GraphsJ targets two paramount, complementary fields of study:
 
-Students of Operations Research need to easily run graph algorithms, in order to study them with a practical, step-by-step approach: GraphsJ can meet this requirement for well-known algorithms - such as *Prim's Shortest Spanning Tree* - which often prove to be cross-subject.
+* **Operations Research**, whose concepts constitute the very core of EighthBridge and GraphsJ itself
 
-On the other hand, researchers may want to test their algorithms on a PC, as it's faster and less error-prone, especially as the number of tests increases; unfortunately, writing a whole computer program only to test an algorithm is not always at hand - just the creation a GUI is a rather complex, time-consuming task.
+* **Artificial Intelligence**, via the introduction of [LambdaPrism](https://github.com/giancosta86/LambdaPrism) into the application kernel
 
-GraphsJ satisfies both user groups, providing an easy-to-use interface as well as a minimalist Scala framework: people can therefore focus on the business logic making up their algorithms.
 
-This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original architecture, introducing several concepts from Functional Programming; adding and removing scenarios is also extremely simplified: JAR files copied into a dedicated per-user directory will automatically and immediately provide new scenarios.
+The application includes predefined scenarios dealing with problems from both fields - in particular:
 
-Finally, when no scenarios are installed, GraphsJ can automatically download the latest version of its scenarios pack directly from GitHub! ^\_\_^
+* A customized version of **GraphPlan** for Artificial Intelligence
+
+* Prim's **Shortest Spanning Tree (SST)** for Operations Research
+
+
+GraphsJ is profoundly influenced by the elegance and effectiveness of *Functional Programming*, which it mixes with OOP techniques thanks to the [Scala](http://www.scala-lang.org/) programming language.
 
 
 ## Features
 
 * *Modern user interface*, employing **ScalaFX**
 
-* *Flexible and vastly enhanced canvas* to draw and edit graphs
+* *Flexible and vastly enhanced canvas* to draw and edit graphs, now supporting **zoom** and **pan**, similar to map navigation
 
 * ScalaFX-based **SDK**, enabling anyone to easily *create new scenarios*
 
 * **Scenario-discovery engine**, *automatically adding and removing scenarios*
 
 * **Automated installation of the predefined scenarios**, retrieved from [GraphsJ-scenarios](https://github.com/giancosta86/GraphsJ-scenarios)
+
+* Graphs can be exported as PNG images
 
 * *Simplified model*, inspired by **Functional Programming**
 
@@ -43,7 +52,7 @@ Finally, when no scenarios are installed, GraphsJ can automatically download the
 
 ## Requirements
 
-Java 8u65 or later is recommended.
+Java 8u91 or later compatible is recommended.
 
 
 
@@ -73,18 +82,13 @@ For detailed information, please refer to the [SDK project page](https://github.
 
 ## Screenshots
 
-![Drawing](screenshots/Drawing.png)
+![Add/Delete GraphPlan](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/AdGraphPlan.png)
 
-![Main window](screenshots/MainWindow.png)
+![Prim's Shortest Spanning Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/PrimSST.png)
 
-![Splash screen](screenshots/SplashScreen.png)
-
-![Installing scenarios](screenshots/InstallingScenarios.png)
 
 
 ## Special thanks
-
-The icons in the menu and toolbar are part of the [Crystal Clear icon set](https://commons.wikimedia.org/wiki/Crystal_Clear), by [Everaldo Coelho](https://en.wikipedia.org/wiki/Everaldo_Coelho).
 
 Special thanks to:
 
@@ -92,6 +96,9 @@ Special thanks to:
 * [Dott. Claudia D'Ambrosio](http://www.lix.polytechnique.fr/~dambrosio/)
 
 for their suggestions.
+
+The icons in the menu and toolbar are part of the [Crystal Clear icon set](https://commons.wikimedia.org/wiki/Crystal_Clear), by [Everaldo Coelho](https://en.wikipedia.org/wiki/Everaldo_Coelho).
+
 
 
 ## Further references
@@ -103,3 +110,5 @@ for their suggestions.
 * [GraphsJ - Scenarios](https://github.com/giancosta86/GraphsJ-scenarios)
 
 * [EighthBridge](https://github.com/giancosta86/EighthBridge)
+
+* [LambdaPrism](https://github.com/giancosta86/LambdaPrism)

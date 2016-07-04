@@ -20,51 +20,24 @@
 
 package info.gianlucacosta.graphsj
 
-import java.io.File
-import java.nio.file.{FileSystems, StandardWatchEventKinds}
-import java.util.concurrent.TimeUnit
+import java.nio.file.{Path, WatchEvent}
+import java.time.Duration
 
 import info.gianlucacosta.graphsj.windows.main.MainWindowController
-
-import scala.collection.JavaConversions._
-
-private class ScenariosDirectoryWatcher(mainWindowController: MainWindowController, baseDirectory: File) extends Thread {
-  private val watcher = FileSystems.getDefault.newWatchService()
-
-  private val TimeOutInSeconds = 8
-
-  setDaemon(true)
+import info.gianlucacosta.helios.files.DirectoryWatcher
 
 
-  override def run(): Unit = {
-    while (true) {
-      if (baseDirectory.isDirectory) {
-        baseDirectory.toPath.register(
-          watcher,
-          StandardWatchEventKinds.ENTRY_CREATE,
-          StandardWatchEventKinds.ENTRY_MODIFY,
-          StandardWatchEventKinds.ENTRY_DELETE)
+private class ScenariosDirectoryWatcher(
+                                         mainWindowController: MainWindowController[_, _, _],
+                                         baseDirectory: Path
+                                       ) extends DirectoryWatcher(
+  baseDirectory,
+  Duration.ofSeconds(8)) {
 
-        var keyValid = true
+  override def onEvents(events: List[WatchEvent[_]]): Unit =
+    mainWindowController.scenarioRepository =
+      new ScenarioRepository(baseDirectory.toFile)
 
-        while (keyValid) {
-          val watchKey = watcher.poll(TimeOutInSeconds, TimeUnit.SECONDS)
-
-          if (watchKey != null) {
-            val events = watchKey.pollEvents()
-
-            if (events.nonEmpty) {
-              mainWindowController.scenarioRepository = new ScenarioRepository(baseDirectory)
-            }
-
-            keyValid = watchKey.reset()
-          } else {
-            keyValid = baseDirectory.isDirectory
-          }
-        }
-      }
-
-      Thread.sleep(TimeOutInSeconds * 1000)
-    }
-  }
 }
+
+

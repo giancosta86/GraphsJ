@@ -21,227 +21,249 @@
 package info.gianlucacosta.graphsj.windows.main
 
 import java.io._
-import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.util.concurrent.Callable
-import java.util.function.{Consumer, Predicate}
-import java.util.regex.Pattern
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.fxml.FXML
-import javafx.scene.Node
-import javafx.scene.control.Label
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.Region
-import javax.json.{Json, JsonObject}
+import javafx.stage.Stage
+import javax.imageio.ImageIO
 
-import com.thoughtworks.xstream.XStream
-import com.thoughtworks.xstream.converters.ConversionException
-import com.thoughtworks.xstream.io.xml.StaxDriver
 import info.gianlucacosta.eighthbridge.fx.canvas.GraphCanvas
+import info.gianlucacosta.eighthbridge.fx.canvas.basic.{BasicLink, BasicVertex}
 import info.gianlucacosta.eighthbridge.graphs.point2point.visual.VisualGraph
-import info.gianlucacosta.eighthbridge.util.DesktopUtils
-import info.gianlucacosta.eighthbridge.util.fx.dialogs.{Alerts, InputDialogs}
 import info.gianlucacosta.graphsj._
-import info.gianlucacosta.graphsj.windows.BusyDialog
-import info.gianlucacosta.graphsj.windows.about.AboutBox
-import info.gianlucacosta.graphsj.{ArtifactInfo=>AppInfo}
+import info.gianlucacosta.helios.apps.AppInfo
+import info.gianlucacosta.helios.desktop.DesktopUtils
+import info.gianlucacosta.helios.fx.about.AboutBox
+import info.gianlucacosta.helios.fx.dialogs.FileChooserExtensions._
+import info.gianlucacosta.helios.fx.dialogs.{Alerts, InputDialogs}
 
-import scala.collection.JavaConversions._
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property.{BooleanProperty, ObjectProperty}
-import scalafx.geometry.Dimension2D
+import scalafx.embed.swing.SwingFXUtils
+import scalafx.scene.SnapshotParameters
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.stage.{FileChooser, Stage, WindowEvent}
+import scalafx.stage.FileChooser
 
 
-class MainWindowController {
-  private val PredefinedScenariosJarFileNameRegex = Pattern.compile(raw"graphsj-scenarios-\d+(?:[\d\.]+)\.jar")
+object MainWindowController {
+  val Stylesheet = getClass.getResource("MainWindow.css")
+}
 
-  private var xstream: XStream = _
+class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGraph[V, L, G]] {
+  private var aboutBox: AboutBox = _
 
-  private val scenarioRepositoryLock = new Object
-
-  val stage = ObjectProperty[Stage](null.asInstanceOf[Stage])
-
-  val aboutBox = ObjectProperty[AboutBox](null.asInstanceOf[AboutBox])
-
-
-  private var _scenarioRepository: ScenarioRepository = _
-
-  def scenarioRepository: ScenarioRepository = {
-    scenarioRepositoryLock.synchronized {
-      _scenarioRepository
-    }
-  }
+  private var stage: Stage = _
+  private var appInfo: AppInfo = _
+  private var workspace: GraphWorkspace[V, L, G] = _
 
 
-  def scenarioRepository_=(newValue: ScenarioRepository): Unit = {
-    scenarioRepositoryLock.synchronized {
-      _scenarioRepository = newValue
-
-      xstream = new XStream(new StaxDriver)
-      xstream.setClassLoader(newValue.scenariosClassLoader)
-    }
-  }
-
-
-  stage.addListener((observable: Observable) => {
-    require(stage() != null)
-
-    stage().onCloseRequest = (windowEvent: WindowEvent) => {
-      if (!canLeaveDocument) {
-        windowEvent.consume()
-      }
-    }
-
-
-    stage().title <== Bindings.createStringBinding(new Callable[String] {
-      override def call(): String = {
-        String.format("%s%s%s",
-          AppInfo.name,
-
-          scenarioFile().map(
-            file => " - " + file.getName
-          ).getOrElse(
-            ""
-          ),
-
-          if (modified()) " *" else ""
-        )
-      }
-    },
-
-      scenarioFile,
-      modified
-    )
-
-
-    setupMenusAndToolbar()
-  })
-
-
-  private val scenarioFile = ObjectProperty[Option[File]](None)
-  scenarioFile.addListener((observable: Observable) => {
-    modified() = false
-  })
-
-  private val modified = BooleanProperty(false)
-
-  private val runState = ObjectProperty[RunState](NotRunning)
-
-  private val running = BooleanProperty(false)
-  running <== runState =!= NotRunning
-
-  running.addListener((o: javafx.beans.value.ObservableValue[_ <: java.lang.Boolean], oldValue: java.lang.Boolean, newValue: java.lang.Boolean) => {
-    if (newValue != oldValue) {
-      if (running()) {
-        algorithm = scenario().get.createAlgorithm()
-        stepIndex = 0
-        runtimeCanvas() = Some(new GraphCanvas(
-          scenario().get.createRuntimeController(),
-          designGraph)
-        )
-
-        graphCanvasPane.content = runtimeCanvas().get
-      } else {
-        graphCanvasPane.content = designCanvas().get
-      }
-    }
-  })
-
-
-  private val scenario = ObjectProperty[Option[Scenario]](None)
-
-  private val designCanvas = ObjectProperty[Option[GraphCanvas]](None)
-  designCanvas.addListener((observable: Observable) => {
-    designCanvas().get.graph.addListener((graphObservable: Observable) => {
-      modified() = true
-    })
-
-    graphCanvasPane.content = designCanvas().get
-    designCanvas().get.requestFocus()
-
-    designCanvas().get.addEventHandler(MouseEvent.ANY, new EventHandler[MouseEvent] {
-      override def handle(event: MouseEvent): Unit = {
-        designCanvas().get.requestFocus()
-
-        event.consume()
-      }
-    })
-
-
-    ()
-  })
-
-  private val runtimeCanvas = ObjectProperty[Option[GraphCanvas]](None)
-  runtimeCanvas.addListener((observable: Observable) => {
-    runtimeCanvas().get.requestFocus()
-
-    runtimeCanvas().get.addEventHandler(MouseEvent.ANY, new EventHandler[MouseEvent] {
-      override def handle(event: MouseEvent): Unit = {
-        runtimeCanvas().get.requestFocus()
-
-        event.consume()
-      }
-    })
-
-    ()
-  })
-
-
-  private var algorithm: Algorithm = _
-  private var stepIndex: Int = _
-
-
-  private def designGraph: VisualGraph = designCanvas().get.graph()
-
-  private def designGraph_=(newGraph: VisualGraph): Unit = {
-    designCanvas().get.graph() = newGraph
-  }
-
-
-  private def runtimeGraph: VisualGraph = runtimeCanvas().get.graph()
-
-  private def runtimeGraph_=(newGraph: VisualGraph): Unit = {
-    runtimeCanvas().get.graph() = newGraph
-  }
-
-
-  private val scenarioFileChooser: FileChooser = {
-    val fileChooser = new FileChooser
-
-    fileChooser.extensionFilters.setAll(
-      new FileChooser.ExtensionFilter("Scenario", s"*${AppParams.DefaultExtension}")
-    )
-
-    fileChooser.title = AppInfo.name
-
-    fileChooser
-  }
-
-
-  private val consoleFileChooser: FileChooser = {
-    val fileChooser = new FileChooser
+  private lazy val consoleFileChooser: FileChooser = {
+    val fileChooser =
+      new FileChooser
 
     fileChooser.extensionFilters.setAll(
       new FileChooser.ExtensionFilter("Text file", "*.txt"),
       new FileChooser.ExtensionFilter("Any file", "*.*")
     )
 
-    fileChooser.title = AppInfo.name
+    fileChooser.title =
+      "Save console output..."
+
+    fileChooser
+  }
+
+  private lazy val exportAsImageFileChooser: FileChooser = {
+    val fileChooser =
+      new FileChooser
+
+    fileChooser.extensionFilters.setAll(
+      new FileChooser.ExtensionFilter("PNG image", "*.png")
+    )
+
+    fileChooser.title =
+      "Export as image..."
 
     fileChooser
   }
 
 
-  private var latestScenarioFile: Option[File] = None
-  private var latestConsoleFile: Option[File] = None
+  def scenarioRepository: ScenarioRepository =
+    workspace.scenarioRepository
+
+
+  def scenarioRepository_=(newValue: ScenarioRepository): Unit =
+    workspace.scenarioRepository = newValue
+
+
+  def setup(stage: Stage, appInfo: AppInfo, scenarioRepository: ScenarioRepository): Unit = {
+    this.stage =
+      stage
+
+    this.appInfo =
+      appInfo
+
+
+    Platform.runLater {
+      aboutBox = new AboutBox(appInfo)
+    }
+
+
+    val scenarioFileChooser: FileChooser = {
+      val fileChooser =
+        new FileChooser
+
+      fileChooser.extensionFilters.setAll(
+        new FileChooser.ExtensionFilter("Scenario", s"*${App.DefaultExtension}")
+      )
+
+      fileChooser.title =
+        appInfo.name
+
+      fileChooser
+    }
+
+    workspace =
+      new GraphWorkspace[V, L, G](appInfo, stage, scenarioRepository, scenarioFileChooser) {
+        bindEvents()
+
+        designCanvasProperty.addListener((observable: Observable) => {
+          workspace.designCanvas.foreach(designCanvas => {
+            designCanvas.graphProperty.addListener((graphObservable: Observable) => {
+              workspace.setModified()
+            })
+
+            graphCanvasPane.content =
+              designCanvas
+
+            designCanvas.requestFocus()
+
+            designCanvas.addEventHandler(MouseEvent.ANY, new EventHandler[MouseEvent] {
+              override def handle(event: MouseEvent): Unit = {
+                designCanvas.requestFocus()
+
+                event.consume()
+              }
+            })
+          })
+
+          ()
+        })
+      }
+
+
+    stage.title <== Bindings.createStringBinding(new Callable[String] {
+      override def call(): String = {
+        String.format("%s%s%s",
+          appInfo.name,
+
+          workspace.documentFile.map(
+            file => " - " + file.getName
+          ).getOrElse(
+            ""
+          ),
+
+          if (workspace.modified) " *" else ""
+        )
+      }
+    },
+
+      workspace.documentFileProperty,
+      workspace.modifiedProperty
+    )
+
+    setupMenusAndToolbar()
+  }
+
+
+  private val runState =
+    ObjectProperty[RunState](NotRunning)
+
+  private val running =
+    BooleanProperty(false)
+
+  running <==
+    runState =!= NotRunning
+
+
+  running.addListener((o: javafx.beans.value.ObservableValue[_ <: java.lang.Boolean], oldValue: java.lang.Boolean, newValue: java.lang.Boolean) => {
+    if (newValue != oldValue) {
+      if (running()) {
+        algorithm =
+          workspace.scenario.get.createAlgorithm()
+
+        stepIndex =
+          0
+
+        runtimeCanvasProperty() =
+          Some(new GraphCanvas(
+            workspace.scenario.get.createRuntimeController(),
+            designGraph)
+          )
+
+        graphCanvasPane.content =
+          runtimeCanvas.get
+      } else {
+        graphCanvasPane.content =
+          workspace.designCanvas.get
+      }
+    }
+  })
+
+
+  private val runtimeCanvasProperty =
+    ObjectProperty[Option[GraphCanvas[V, L, G]]](None)
+
+
+  def runtimeCanvas: Option[GraphCanvas[V, L, G]] =
+    runtimeCanvasProperty.get
+
+
+  def runtimeCanvas(newValue: Option[GraphCanvas[V, L, G]]): Unit = {
+    runtimeCanvasProperty.set(newValue)
+  }
+
+
+  runtimeCanvasProperty.addListener((observable: Observable) => {
+    runtimeCanvas.foreach(runtimeCanvas => {
+      runtimeCanvas.requestFocus()
+
+      runtimeCanvas.addEventHandler(MouseEvent.ANY, new EventHandler[MouseEvent] {
+        override def handle(event: MouseEvent): Unit = {
+          runtimeCanvas.requestFocus()
+
+          event.consume()
+        }
+      })
+    })
+
+    ()
+  })
+
+
+  private var algorithm: Algorithm[V, L, G] = _
+  private var stepIndex: Int = _
+
+
+  private def designGraph: G =
+    workspace.designCanvas.get.graph
+
+  private def designGraph_=(newGraph: G): Unit =
+    workspace.designCanvas.get.graph = newGraph
+
+
+  private def runtimeGraph: G =
+    runtimeCanvasProperty().get.graph
+
+  private def runtimeGraph_=(newGraph: G): Unit =
+    runtimeCanvasProperty().get.graph = newGraph
 
 
   private lazy val outputConsole: OutputConsole = new OutputConsole {
@@ -256,54 +278,88 @@ class MainWindowController {
     override def writeln(): Unit = {
       consoleArea.appendText("\n")
     }
-
-
-    override def writeHeader(header: String): Unit = {
-      writeln("------------")
-      writeln(header)
-      writeln("------------")
-    }
   }
 
 
   private def setupMenusAndToolbar() {
-    newMenuItem.disable <== running
+    val scenarioProperty =
+      workspace.scenarioProperty
+
+
+    newMenuItem.disable <==
+      running
+
     bindButton(newButton, newMenuItem)
 
-    openMenuItem.disable <== running
+
+    openMenuItem.disable <==
+      running
+
     bindButton(openButton, openMenuItem)
 
-    saveMenuItem.disable <== (scenario === None) || running || (!modified)
+
+    saveMenuItem.disable <==
+      (scenarioProperty === None) || running || (!workspace.modifiedProperty)
+
     bindButton(saveButton, saveMenuItem)
 
-    saveAsMenuItem.disable <== (scenario === None) || running
+
+    saveAsMenuItem.disable <==
+      (scenarioProperty === None) || running
+
     bindButton(saveAsButton, saveAsMenuItem)
 
 
-    fullRunMenuItem.disable <== (scenario === None) || (runState === InFullRun) || (runState === Complete)
+    exportAsImageMenuItem.disable <==
+      (scenarioProperty === None)
+
+
+    fullRunMenuItem.disable <==
+      (scenarioProperty === None) || (runState === InFullRun) || (runState === Complete)
+
     bindButton(fullRunButton, fullRunMenuItem)
 
-    runStepMenuItem.disable <== (scenario === None) || (runState === InFullRun) || (runState === Complete)
+
+    runStepMenuItem.disable <==
+      (scenarioProperty === None) || (runState === InFullRun) || (runState === Complete)
+
     bindButton(runStepButton, runStepMenuItem)
 
-    stopRunMenuItem.disable <== (scenario === None) || (runState === NotRunning) || (runState === InFullRun)
+
+    stopRunMenuItem.disable <==
+      (scenarioProperty === None) || (runState === NotRunning) || (runState === InFullRun)
+
     bindButton(stopRunButton, stopRunMenuItem)
 
-    editMenu.disable <== (scenario === None) || running
-    scenarioMenu.disable <== (scenario === None) || running
-    runMenu.disable <== (scenario === None)
+
+    editMenu.disable <==
+      (scenarioProperty === None) || running
+
+
+    scenarioMenu.disable <==
+      (scenarioProperty === None) || running
+
+
+    runMenu.disable <==
+      (scenarioProperty === None)
+
 
     bindButton(helpButton, helpMenuItem)
+
 
     bindButton(aboutButton, aboutMenuItem)
   }
 
 
   private def bindButton(button: Button, menuItem: MenuItem) {
-    val buttonId = button.id()
+    val buttonId =
+      button.id()
 
-    val actionName = buttonId.substring(0, buttonId.lastIndexOf("Button"))
-    val expectedMenuItemId = actionName + "MenuItem"
+    val actionName =
+      buttonId.substring(0, buttonId.lastIndexOf("Button"))
+
+    val expectedMenuItemId =
+      actionName + "MenuItem"
 
     if (menuItem.id() != expectedMenuItemId) {
       throw new IllegalArgumentException(
@@ -312,20 +368,28 @@ class MainWindowController {
     }
 
 
-    val actionImage = new Image(getClass.getResourceAsStream(
-      s"actionIcons/${actionName}.png"
-    ))
+    val actionImage =
+      new Image(getClass.getResourceAsStream(
+        s"actionIcons/${actionName}.png"
+      ))
 
-    menuItem.graphic = new ImageView(actionImage)
-    button.graphic = new ImageView(actionImage)
+    menuItem.graphic =
+      new ImageView(actionImage)
+
+    button.graphic =
+      new ImageView(actionImage)
 
 
-    button.disable <== menuItem.disable
-    button.onAction <== menuItem.onAction
+    button.disable <==
+      menuItem.disable
+
+    button.onAction <==
+      menuItem.onAction
 
 
     button.tooltip = new scalafx.scene.control.Tooltip() {
-      text <== menuItem.text
+      text <==
+        menuItem.text
     }
   }
 
@@ -333,368 +397,86 @@ class MainWindowController {
    * ACTIONS
    */
   def newScenario(): Unit = {
-    if (!canLeaveDocument) {
-      return
-    }
-
-    if (_scenarioRepository.scenarios.isEmpty) {
-      val installPredefinedScenariosButton = new ButtonType("Install predefined scenarios")
-      val showScenariosDirectoryButton = new ButtonType("Show scenarios directory")
-
-      val noScenariosAlert = new Alert(AlertType.Confirmation) {
-        initOwner(stage())
-        headerText = "No scenarios installed"
-        contentText = (
-          s"${AppInfo.name} requires at least one scenario.\n\n"
-            + s"${AppInfo.name} can automatically install the predefined scenario pack; alternatively, "
-            + "you can download one or more .jar files providing scenarios and copy them "
-            + "to the scenarios directory."
-          )
-
-        buttonTypes = Seq(
-          installPredefinedScenariosButton,
-          showScenariosDirectoryButton,
-          ButtonType.Cancel
-        )
-
-        dialogPane()
-          .getChildren
-          .filtered(new Predicate[Node] {
-            override def test(node: Node): Boolean = node.isInstanceOf[Label]
-          })
-          .forEach(new Consumer[Node] {
-            override def accept(node: Node): Unit = {
-              node.asInstanceOf[Label].setMinHeight(Region.USE_PREF_SIZE)
-            }
-          })
-      }
-
-      val noScenariosResolutionInput = noScenariosAlert.showAndWait()
-
-      noScenariosResolutionInput match {
-        case Some(`installPredefinedScenariosButton`) =>
-          installPredefinedScenarios()
-
-        case Some(`showScenariosDirectoryButton`) =>
-          showScenariosDirectory()
-
-        case _ =>
-      }
-
-      return
-    }
-
-    val scenarioInput = InputDialogs.askForItem(
-      "Scenario:",
-      _scenarioRepository.scenarios,
-      header = "New scenario..."
-    )
-
-    if (scenarioInput.isEmpty) {
-      return
-    }
-
-    val newScenario = scenarioInput.get.clone()
-
-    try {
-      val newDesignCanvas = new GraphCanvas(
-        newScenario.createDesignController(),
-        newScenario.createDesignGraph()
-      )
-
-      scenario() = Some(newScenario)
-      designCanvas() = Some(newDesignCanvas)
-
-
-      scenarioFile() = None
-    } catch {
-      case ex: Exception =>
-        Alerts.showException(ex)
-
-        ex.printStackTrace(System.err)
-    }
-  }
-
-
-  def installPredefinedScenarios(): Unit = {
-    AppParams.ensureScenariosDirectory()
-
-    try {
-      val existingScenariosJarFile = AppParams.ScenariosDirectory
-        .listFiles()
-        .find(file =>
-          PredefinedScenariosJarFileNameRegex.matcher(file.getName).matches()
-        )
-
-
-      if (existingScenariosJarFile.nonEmpty) {
-        val reinstallInput = InputDialogs.askYesNoCancel(
-          "The predefined scenarios are already installed.\n\nDo you wish to reinstall them?",
-          s"${AppInfo.name} - Scenarios"
-        )
-
-        if (!reinstallInput.contains(true)) {
-          return
-        }
-
-        if (!existingScenariosJarFile.get.delete()) {
-          throw new RuntimeException(s"Cannot delete the predefined scenarios file:\n'${existingScenariosJarFile.get.getAbsolutePath}'")
-        }
-      }
-
-      val busyDialog = new BusyDialog(
-        stage(),
-        "Installing scenarios..."
-      ) {
-        run {
-          downloadPredefinedScenariosJar()
-        }
-      }
-    } catch {
-      case ex: Exception =>
-        Alerts.showException(ex)
-    }
-  }
-
-  private def downloadPredefinedScenariosJar(): Unit = {
-    val scenariosApiUrl =
-      new URL("https://api.github.com/repos/giancosta86/GraphsJ-scenarios/releases/latest")
-
-    val scenariosApiJsonReader = Json.createReader(scenariosApiUrl.openStream())
-
-    try {
-      val scenariosApiJson = scenariosApiJsonReader.readObject()
-
-      val assets = scenariosApiJson.getJsonArray("assets")
-
-      assets.foreach(asset => {
-        val assetObject = asset.asInstanceOf[JsonObject]
-        val assetName = assetObject.getString("name")
-
-        val isScenariosJarAsset = PredefinedScenariosJarFileNameRegex.matcher(assetName).matches()
-
-        if (isScenariosJarAsset) {
-          val targetFile = new File(AppParams.ScenariosDirectory, assetName)
-
-          val sourceUrl = new URL(assetObject.getString("browser_download_url"))
-
-          val sourceStream = sourceUrl.openStream()
-          try {
-            Files.copy(sourceStream, targetFile.toPath)
-          } finally {
-            sourceStream.close()
-          }
-
-          Platform.runLater {
-            Alerts.showInfo("The predefined scenarios have been installed.", s"${AppInfo.name} - Scenarios")
-          }
-        }
-      })
-    } finally {
-      scenariosApiJsonReader.close()
-    }
-  }
-
-
-  def showScenariosDirectory(): Unit = {
-    try {
-      AppParams.ensureScenariosDirectory()
-      DesktopUtils.openFile(AppParams.ScenariosDirectory)
-    } catch {
-      case ex: Exception =>
-        Alerts.showException(ex)
+    if (workspace.newDocument()) {
+      workspace.setModified()
     }
   }
 
 
   def openScenario() {
-    if (!canLeaveDocument) {
-      return
-    }
+    workspace.openDocument()
+  }
 
-    latestScenarioFile.foreach(file =>
-      scenarioFileChooser.initialDirectory = file.getParentFile
-    )
 
-    val selectedFile = scenarioFileChooser.showOpenDialog(stage())
-    if (selectedFile == null) {
+  def saveScenario(): Unit = {
+    workspace.saveDocument()
+  }
+
+
+  def saveScenarioAs(): Unit = {
+    workspace.saveAsDocument()
+  }
+
+
+  def exportCurrentGraphAsImage(): Unit = {
+    val imageFile =
+      exportAsImageFileChooser.smartSave(stage)
+
+    if (imageFile == null) {
       return
     }
 
     try {
-      val sourceReader = new InputStreamReader(new FileInputStream(selectedFile), "UTF-8")
-      try {
-        val document = xstream.fromXML(sourceReader).asInstanceOf[GraphDocument]
+      val image =
+        if (running())
+          runtimeCanvas.get.snapshot(new SnapshotParameters(), null)
+        else
+          workspace.designCanvas.get.snapshot(new SnapshotParameters(), null)
 
-        scenario() = Some(document.scenario)
-        designCanvas() = Some(new GraphCanvas(
-          document.scenario.createDesignController(),
-          document.designGraph
-        ))
-      } finally {
-        sourceReader.close()
-      }
-
-
-      scenarioFile() = Some(selectedFile)
-      latestScenarioFile = Some(selectedFile)
-    } catch {
-      case ex: ConversionException =>
-        val scenarioName = ex.getShortMessage.substring(0, ex.getShortMessage.lastIndexOf(":")).trim
-
-        Alerts.showWarning(s"The requested scenario cannot be loaded:\n\n'${scenarioName}'\n\nPlease, ensure that the related JAR file is available in the scenarios directory.")
-
-        ex.printStackTrace(System.err)
-
-        showScenariosDirectory()
-
-
-      case ex: Exception =>
-        Alerts.showException(ex)
-
-        ex.printStackTrace(System.err)
-    }
-  }
-
-
-  def saveScenario(): Boolean = {
-    if (scenarioFile().isEmpty) {
-      saveScenarioAs()
-    } else {
-      doActualSaving(scenarioFile().get)
-    }
-  }
-
-
-  def saveScenarioAs(): Boolean = {
-    latestScenarioFile.foreach(file =>
-      scenarioFileChooser.initialDirectory = file.getParentFile
-    )
-
-    val selectedFile = scenarioFileChooser.showSaveDialog(stage())
-    if (selectedFile == null) {
-      return false
-    }
-
-    val actualFile = if (!selectedFile.getName.endsWith(AppParams.DefaultExtension)) {
-      new File(selectedFile.getAbsolutePath + AppParams.DefaultExtension)
-    } else {
-      selectedFile
-    }
-
-
-    if (!doActualSaving(actualFile)) {
-      return false
-    }
-
-    latestScenarioFile = Some(actualFile)
-    scenarioFile() = Some(actualFile)
-    true
-  }
-
-
-  private def doActualSaving(targetFile: File): Boolean = {
-    try {
-      val document = GraphDocument(
-        scenario().get,
-        designGraph
+      ImageIO.write(
+        SwingFXUtils.fromFXImage(image, null),
+        "png",
+        imageFile
       )
-
-
-      val targetWriter = new OutputStreamWriter(new FileOutputStream(targetFile), "UTF-8")
-      try {
-        xstream.toXML(document, targetWriter)
-      } finally {
-        targetWriter.close()
-      }
-
-
-      modified() = false
-      true
+      Alerts.showInfo("Graph image exported successfully.")
     } catch {
       case ex: Exception =>
-        Alerts.showException(ex)
-
         ex.printStackTrace(System.err)
 
-        false
+        Platform.runLater {
+          Alerts.showException(ex, alertType = AlertType.Warning)
+        }
     }
   }
 
 
   def exitProgram(): Unit = {
-    stage().close()
-  }
-
-
-  private def canLeaveDocument: Boolean = {
-    if (modified()) {
-      val inputResult = InputDialogs.askYesNoCancel("Do you wish to save your document?")
-
-      inputResult match {
-        case Some(true) =>
-          saveScenario()
-
-        case Some(false) =>
-          true
-
-        case None =>
-          false
-      }
-
-    } else {
-      true
-    }
+    workspace.closeStage()
   }
 
 
   def selectAll(): Unit = {
-    designGraph = designGraph.selectAll
-  }
-
-
-  def chooseCanvasSize(): Unit = {
-    val newWidth = InputDialogs.askForDouble("Width:", designGraph.dimension.width, 1)
-    if (newWidth.isEmpty) {
-      return
-    }
-
-    val newHeight = InputDialogs.askForDouble("Height:", designGraph.dimension.height, 1)
-    if (newHeight.isEmpty) {
-      return
-    }
-
-
-    designGraph = designGraph.visualCopy(dimension = new Dimension2D(newWidth.get, newHeight.get))
+    designGraph =
+      designGraph.selectAll
   }
 
 
   def saveConsoleAs(): Unit = {
-    latestConsoleFile.foreach(file =>
-      consoleFileChooser.initialDirectory = file.getParentFile
-    )
+    val chosenFile =
+      consoleFileChooser.smartSave(stage)
 
-    val chosenFile = consoleFileChooser.showSaveDialog(stage())
     if (chosenFile == null) {
       return
     }
 
-    var actualFile = chosenFile
-    val defaultExtensionFilter = consoleFileChooser.getExtensionFilters.get(0)
-    if (consoleFileChooser.getSelectedExtensionFilter == defaultExtensionFilter) {
-      val defaultExtension = defaultExtensionFilter.getExtensions.get(0).substring(1)
-
-      if (!chosenFile.getName.endsWith(defaultExtension)) {
-        actualFile = new File(chosenFile.getAbsolutePath + defaultExtension)
-      }
-    }
-
-    latestConsoleFile = Some(actualFile)
     try {
-      Files.write(actualFile.toPath, consoleArea.getText().getBytes(Charset.forName("utf-8")))
+      Files.write(
+        chosenFile.toPath,
+        consoleArea.getText().getBytes(Charset.forName("utf-8"))
+      )
     } catch {
       case ex: IOException =>
-        Alerts.showException(ex)
+        Alerts.showException(ex, alertType = AlertType.Warning)
     }
   }
 
@@ -705,28 +487,53 @@ class MainWindowController {
 
 
   def showScenarioName(): Unit = {
-    Alerts.showInfo(scenario().get.name, "Scenario name")
+    Alerts.showInfo(workspace.scenario.get.name, "Scenario name")
   }
 
   def showScenarioHelp(): Unit = {
-    scenario().get.showHelp()
+    workspace.scenario.get.showHelp()
   }
 
 
   def showScenarioSettings(): Unit = {
-    scenario().get.showSettings()
+    workspace.scenario.get.showSettings(designGraph).foreach(newGraph =>
+      designGraph = newGraph
+    )
   }
 
 
   def run(): Unit = {
-    runState() = InFullRun
+    runState() =
+      InFullRun
 
-    while (internalRunStep()) {}
+    var executedSteps =
+      0
+
+    val runStepsBeforePausing =
+      workspace.scenario.get.runStepsBeforePausing
+
+    while (internalRunStep()) {
+      executedSteps += 1
+
+      if (runStepsBeforePausing > 0 && executedSteps % runStepsBeforePausing == 0) {
+        InputDialogs.askYesNoCancel(s"The algorithm has already performed ${executedSteps} steps.\n\nDo you wish to continue?") match {
+          case Some(true) =>
+          //Just do nothing
+
+          case _ =>
+            runState() =
+              Complete
+
+            return
+        }
+      }
+    }
   }
 
 
   def runStep(): Unit = {
-    runState() = InStepRun
+    runState() =
+      InStepRun
 
     internalRunStep()
   }
@@ -738,20 +545,29 @@ class MainWindowController {
         algorithm.runStep(stepIndex, runtimeGraph, outputConsole)
 
       require(graphResult != null)
-      runtimeGraph = graphResult
+
+      runtimeGraph =
+        graphResult
 
       if (canProceed) {
-        stepIndex += 1
+        stepIndex +=
+          1
+
         true
       } else {
-        runState() = Complete
+        runState() =
+          Complete
+
         false
       }
     } catch {
       case ex: Exception =>
-        Alerts.showWarning(if (ex.getMessage != null && ex.getMessage.nonEmpty) ex.getMessage else ex.getClass.getSimpleName)
+        ex.printStackTrace(System.err)
 
-        runState() = NotRunning
+        Alerts.showException(ex, alertType = AlertType.Warning)
+
+        runState() =
+          NotRunning
 
         false
     }
@@ -759,100 +575,113 @@ class MainWindowController {
 
 
   def stopRun(): Unit = {
-    runState() = NotRunning
+    runState() =
+      NotRunning
+  }
+
+
+  def installPredefinedScenarios(): Unit = {
+    workspace.installPredefinedScenarios()
+  }
+
+  def showScenariosDirectory(): Unit = {
+    workspace.showScenariosDirectory()
   }
 
 
   def showHelp(): Unit = {
-    DesktopUtils.openBrowser(AppInfo.website)
+    DesktopUtils.openBrowser(appInfo.website)
   }
 
 
   def showAboutBox(): Unit = {
-    aboutBox().showAndWait()
+    aboutBox.showAndWait()
   }
 
 
   @FXML
-  protected var graphCanvasPane: javafx.scene.control.ScrollPane = _
+  var graphCanvasPane: javafx.scene.control.ScrollPane = _
 
 
   @FXML
-  protected var consoleArea: javafx.scene.control.TextArea = _
+  var consoleArea: javafx.scene.control.TextArea = _
 
 
   @FXML
-  protected var newMenuItem: javafx.scene.control.MenuItem = _
+  var newMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var openMenuItem: javafx.scene.control.MenuItem = _
+  var openMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var saveMenuItem: javafx.scene.control.MenuItem = _
+  var saveMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var saveAsMenuItem: javafx.scene.control.MenuItem = _
-
-
-  @FXML
-  protected var editMenu: javafx.scene.control.Menu = _
+  var saveAsMenuItem: javafx.scene.control.MenuItem = _
 
 
   @FXML
-  protected var scenarioMenu: javafx.scene.control.Menu = _
+  var exportAsImageMenuItem: javafx.scene.control.MenuItem = _
 
 
   @FXML
-  protected var runMenu: javafx.scene.control.Menu = _
-
-  @FXML
-  protected var fullRunMenuItem: javafx.scene.control.MenuItem = _
-
-  @FXML
-  protected var runStepMenuItem: javafx.scene.control.MenuItem = _
-
-  @FXML
-  protected var stopRunMenuItem: javafx.scene.control.MenuItem = _
+  var editMenu: javafx.scene.control.Menu = _
 
 
   @FXML
-  protected var installPredefinedScenariosMenuItem: javafx.scene.control.MenuItem = _
+  var scenarioMenu: javafx.scene.control.Menu = _
 
 
   @FXML
-  protected var helpMenuItem: javafx.scene.control.MenuItem = _
+  var runMenu: javafx.scene.control.Menu = _
 
   @FXML
-  protected var aboutMenuItem: javafx.scene.control.MenuItem = _
-
-
-  @FXML
-  protected var newButton: javafx.scene.control.Button = _
+  var fullRunMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var openButton: javafx.scene.control.Button = _
+  var runStepMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var saveButton: javafx.scene.control.Button = _
-
-  @FXML
-  protected var saveAsButton: javafx.scene.control.Button = _
+  var stopRunMenuItem: javafx.scene.control.MenuItem = _
 
 
   @FXML
-  protected var fullRunButton: javafx.scene.control.Button = _
-
-  @FXML
-  protected var runStepButton: javafx.scene.control.Button = _
-
-  @FXML
-  protected var stopRunButton: javafx.scene.control.Button = _
+  var installPredefinedScenariosMenuItem: javafx.scene.control.MenuItem = _
 
 
   @FXML
-  protected var helpButton: javafx.scene.control.Button = _
+  var helpMenuItem: javafx.scene.control.MenuItem = _
 
   @FXML
-  protected var aboutButton: javafx.scene.control.Button = _
+  var aboutMenuItem: javafx.scene.control.MenuItem = _
 
+
+  @FXML
+  var newButton: javafx.scene.control.Button = _
+
+  @FXML
+  var openButton: javafx.scene.control.Button = _
+
+  @FXML
+  var saveButton: javafx.scene.control.Button = _
+
+  @FXML
+  var saveAsButton: javafx.scene.control.Button = _
+
+
+  @FXML
+  var fullRunButton: javafx.scene.control.Button = _
+
+  @FXML
+  var runStepButton: javafx.scene.control.Button = _
+
+  @FXML
+  var stopRunButton: javafx.scene.control.Button = _
+
+
+  @FXML
+  var helpButton: javafx.scene.control.Button = _
+
+  @FXML
+  var aboutButton: javafx.scene.control.Button = _
 }
