@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/custom.css">
 
     <script type="text/javascript" src="js/moondeploy3.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
 
     <meta name="description" content="ScalaFX didactic application for graph algorithms">
-    <meta name="keywords" content="graph, algorithm, scenario, SST, Prim, microkernel">
+    <meta name="keywords" content="graph, algorithm, scenario, SST, Prim, Scala, ScalaFX, Operations Research, Artificial Intelligence">
     <meta name="author" content="Gianluca Costa">
 
     <link rel="shortcut icon" href="favicon.ico">
@@ -42,44 +43,128 @@
         <h1>
 <a id="graphsj" class="anchor" href="#graphsj" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GraphsJ</h1>
 
-<p><em>ScalaFX didactic application for running graph algorithms</em></p>
+<p><em>ScalaFX didactic application for graph algorithms</em></p>
+
+<p>
+  <img src="images/screenshots/AdGraphPlan.png" alt="Add/Delete GraphPlan" />
+</p>
 
 <h2>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
 
-<p><img src="images/screenshots/BasicPrimSST.png" alt="Prim's Shortest Spanning Tree"></p>
+<p>
+  GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms;
+  it features both a ScalaFX visual user interface and a
+  <a href="https://github.com/giancosta86/GraphsJ-sdk">Scenario Development Kit</a> -
+  to create <em>custom scenarios</em> based on the
+  <a href="https://github.com/giancosta86/EighthBridge">EighthBridge</a> toolkit for ScalaFX.
+</p>
 
-<p>GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a visual user interface and a Scenario Development Kit - to create <em>custom scenarios</em> based on the <a href="https://github.com/giancosta86/EighthBridge">EighthBridge</a> toolkit for ScalaFX.</p>
+<p>
+  Starting from version 5.0, GraphsJ targets two paramount, complementary fields of study:
+</p>
 
-<p>Students of Operations Research need to easily run graph algorithms, in order to study them with a practical, step-by-step approach: GraphsJ can meet this requirement for well-known algorithms - such as <em>Prim's Shortest Spanning Tree</em> - which often prove to be cross-subject.</p>
+<ul>
+  <li>
+    <b>Operations Research</b>, whose concepts constitute the very core of EighthBridge and GraphsJ itself
+  </li>
 
-<p>On the other hand, researchers may want to test their algorithms on a PC, as it's faster and less error-prone, especially as the number of tests increases; unfortunately, writing a whole computer program only to test an algorithm is not always at hand - just the creation a GUI is a rather complex, time-consuming task.</p>
+  <li>
+    <b>Artificial Intelligence</b>, via the introduction of
+    <a href="https://github.com/giancosta86/LambdaPrism">LambdaPrism</a> into the application kernel
+  </li>
+</ul>
 
-<p>GraphsJ satisfies both user groups, providing an easy-to-use interface as well as a minimalist Scala framework: people can therefore focus on the business logic making up their algorithms.</p>
+<p>
+The application includes predefined scenarios dealing with problems from both fields - in particular:
+</p>
 
-<p>This new version, GraphsJ 4, is a ScalaFX-oriented redesign of the original architecture, introducing several concepts from Functional Programming; adding and removing scenarios is also extremely simplified: JAR files copied into a dedicated per-user directory will automatically and immediately provide new scenarios.</p>
+<ul>
+  <li>
+    A customized version of <b>GraphPlan</b> for Artificial Intelligence
+  </li>
 
-<p>Finally, when no scenarios are installed, GraphsJ can automatically download the latest version of its scenarios pack directly from GitHub! ^__^</p>
+  <li>
+    Prim's <b>Shortest Spanning Tree (SST)</b> for Operations Research
+  </li>
+</ul>
+
+<p>
+  GraphsJ is profoundly influenced by the elegance and effectiveness of
+  <i>Functional Programming</i>, which it mixes with OOP techniques thanks to
+  the <a href="http://www.scala-lang.org/">Scala</a> programming language.
+</p>
+
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
-<li><p><em>Modern user interface</em>, employing <strong>ScalaFX</strong></p></li>
-<li><p><em>Flexible and vastly enhanced canvas</em> to draw and edit graphs</p></li>
-<li><p>ScalaFX-based <strong>SDK</strong>, enabling anyone to easily <em>create new scenarios</em></p></li>
-<li><p><strong>Scenario-discovery engine</strong>, <em>automatically adding and removing scenarios</em></p></li>
-<li><p><strong>Automated installation of the predefined scenarios</strong>, retrieved from <a href="https://github.com/giancosta86/GraphsJ-scenarios">GraphsJ-scenarios</a></p></li>
-<li><p><em>Simplified model</em>, inspired by <strong>Functional Programming</strong></p></li>
-<li><p><em>Per-scenario options dialog and help</em>, customizable by scenario developers</p></li>
-<li><p><strong>XML-based document files</strong>, to foster <em>interoperability and compatibility with previous versions</em></p></li>
-<li><p><strong>Open source</strong> code available: developers can create a new scenario starting from a consolidated base</p></li>
+  <li>
+    <p>
+      <em>Modern user interface</em>, employing <strong>ScalaFX</strong>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <em>Flexible and vastly enhanced canvas</em> to draw and edit graphs, now supporting <i>zoom</i> and <i>pan</i>, similar to map navigation
+    </p>
+  </li>
+
+  <li>
+    <p>
+      ScalaFX-based <strong>SDK</strong>, enabling anyone to easily <em>create new scenarios</em>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <strong>Scenario-discovery engine</strong>, <em>automatically adding and removing scenarios</em>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <strong>Automated installation of the predefined scenarios</strong>, retrieved from <a href="https://github.com/giancosta86/GraphsJ-scenarios">GraphsJ-scenarios</a>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      Graphs can be exported as PNG images
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <em>Simplified model</em>, inspired by <strong>Functional Programming</strong>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <em>Per-scenario options dialog and help</em>, customizable by scenario developers
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <strong>XML-based document files</strong>, to foster <em>interoperability and compatibility with previous versions</em>
+    </p>
+  </li>
+
+  <li>
+    <p>
+      <strong>Open source</strong> code available: developers can create a new scenario starting from a consolidated base
+    </p>
+  </li>
 </ul>
 
 <h2>
 <a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
 
-<p>Java 8u65 or later is recommended.</p>
+<p>Java 8u91 or later compatible is recommended.</p>
 
 <h2>
 <a id="running-graphsj" class="anchor" href="#running-graphsj" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running GraphsJ</h2>
@@ -103,18 +188,14 @@
 <h2>
 <a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screenshots</h2>
 
-<p><img src="images/screenshots/Drawing.png" alt="Drawing"></p>
 
-<p><img src="images/screenshots/MainWindow.png" alt="Main window"></p>
+<p><img src="images/screenshots/PrimSST.png" alt="Prim's Shortest Spanning Tree"></p>
 
-<p><img src="images/screenshots/SplashScreen.png" alt="Splash screen"></p>
+<p><img src="images/screenshots/AdGraphPlan.png" alt="Add/Delete GraphPlan"></p>
 
-<p><img src="images/screenshots/InstallingScenarios.png" alt="Installing scenarios"></p>
 
 <h2>
 <a id="special-thanks" class="anchor" href="#special-thanks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Special thanks</h2>
-
-<p>The icons in the menu and toolbar are part of the <a href="https://commons.wikimedia.org/wiki/Crystal_Clear">Crystal Clear icon set</a>, by <a href="https://en.wikipedia.org/wiki/Everaldo_Coelho">Everaldo Coelho</a>.</p>
 
 <p>Special thanks to:</p>
 
@@ -125,6 +206,10 @@
 
 <p>for their suggestions.</p>
 
+<p>
+  The icons in the menu and toolbar are part of the <a href="https://commons.wikimedia.org/wiki/Crystal_Clear">Crystal Clear icon set</a>, by <a href="https://en.wikipedia.org/wiki/Everaldo_Coelho">Everaldo Coelho</a>.
+</p>
+
 <h2>
 <a id="further-references" class="anchor" href="#further-references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Further references</h2>
 
@@ -133,6 +218,7 @@
 <li><p><a href="https://github.com/giancosta86/GraphsJ-sdk">GraphsJ Scenario Development Kit</a></p></li>
 <li><p><a href="https://github.com/giancosta86/GraphsJ-scenarios">GraphsJ - Scenarios</a></p></li>
 <li><p><a href="https://github.com/giancosta86/EighthBridge">EighthBridge</a></p></li>
+<li><p><a href="https://github.com/giancosta86/LambdaPrism">LambdaPrism</a></p></li>
 <li><p><a href="http://gianlucacosta.info/moondeploy">MoonDeploy</a></p></li>
 </ul>
       </section>
@@ -146,8 +232,5 @@
         <p>MoonDeploy features are provided by the <a href="https://github.com/giancosta86/MoonDeploy-JS">MoonDeploy-JS</a> library.</p>
       </footer>
     </div>
-
-
-
   </body>
 </html>

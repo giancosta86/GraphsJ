@@ -1,0 +1,32 @@
+b {
+  font-weight: bold;
+}
+
+
+i {
+  font-style: italic;
+}
+
+
+body,
+#main_content_wrap {
+  background: white;
+}
+
+
+.downloadButton {
+  background: lightgrey;
+  border-radius: 10px;
+}
+
+
+
+@media (max-width: 999px) {
+  .facet_sidebar {
+    display: none;
+  }
+
+  .inner {
+    max-width: 90%;
+  }
+}
