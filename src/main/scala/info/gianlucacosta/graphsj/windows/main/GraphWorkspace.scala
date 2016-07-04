@@ -150,15 +150,16 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
       noScenariosResolutionOption match {
         case Some(`installPredefinedScenariosButton`) =>
           installPredefinedScenarios()
-          return doNew()
+
 
         case Some(`showScenariosDirectoryButton`) =>
           showScenariosDirectory()
-          return false
 
         case _ =>
-          return false
+          //Just do nothing
       }
+
+      return false
     }
 
     val scenarioFactoryOption = InputDialogs.askForItem(
