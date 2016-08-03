@@ -21,6 +21,7 @@
 package info.gianlucacosta.graphsj
 
 import java.io.File
+import java.net.URL
 import javafx.fxml.FXMLLoader
 import javafx.stage.Stage
 
@@ -36,6 +37,9 @@ import scalafx.scene.layout.BorderPane
 
 
 object App extends AppMain[App](classOf[App]) {
+  val ScenariosApiUrl =
+    new URL("https://api.github.com/repos/giancosta86/GraphsJ-scenarios/releases/latest")
+
   private val MajorVersion =
     ArtifactInfo.version.split('.').head
 
@@ -50,9 +54,12 @@ object App extends AppMain[App](classOf[App]) {
   )
 
   def ensureScenariosDirectory(): Unit = {
-    if (!ScenariosDirectory.isDirectory && !ScenariosDirectory.mkdirs()) {
-      throw new RuntimeException(s"Cannot create the scenarios directory:\n'${ScenariosDirectory}'")
-    }
+    require(
+      ScenariosDirectory.isDirectory ||
+        ScenariosDirectory.mkdirs(),
+
+      "Cannot create the scenarios directory:\n'${ScenariosDirectory}'"
+    )
   }
 }
 

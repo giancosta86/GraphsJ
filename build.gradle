@@ -44,7 +44,7 @@ apply plugin: 'info.gianlucacosta.aurora'
 
 group = 'info.gianlucacosta.graphsj'
 archivesBaseName = 'graphsj'
-version = '5.1'
+version = '6.0'
 
 description = 'ScalaFX didactic application for graph algorithms'
 
@@ -82,7 +82,7 @@ dependencies {
     compile 'javax.json:javax.json-api:1.0'
     compile 'org.glassfish:javax.json:1.0.4'
 
-    compile 'info.gianlucacosta.graphsj:graphsj-sdk:5.0'
+    compile 'info.gianlucacosta.graphsj:graphsj-sdk:6.0'
 }
 
 

@@ -28,5 +28,5 @@ private case object InFullRun extends RunState
 
 private case object InStepRun extends RunState
 
-private case object Complete extends RunState
+private case object Finished extends RunState
 

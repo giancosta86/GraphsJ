@@ -33,8 +33,7 @@ import javafx.stage.Stage
 import javax.imageio.ImageIO
 
 import info.gianlucacosta.eighthbridge.fx.canvas.GraphCanvas
-import info.gianlucacosta.eighthbridge.fx.canvas.basic.{BasicLink, BasicVertex}
-import info.gianlucacosta.eighthbridge.graphs.point2point.visual.VisualGraph
+import info.gianlucacosta.eighthbridge.graphs.point2point.visual.{VisualGraph, VisualLink, VisualVertex}
 import info.gianlucacosta.graphsj._
 import info.gianlucacosta.helios.apps.AppInfo
 import info.gianlucacosta.helios.desktop.DesktopUtils
@@ -54,46 +53,16 @@ import scalafx.stage.FileChooser
 
 
 object MainWindowController {
-  val Stylesheet = getClass.getResource("MainWindow.css")
+  val AppStylesheet = getClass.getResource("MainWindow.css")
 }
 
-class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGraph[V, L, G]] {
+
+class MainWindowController[V <: VisualVertex[V], L <: VisualLink[L], G <: VisualGraph[V, L, G]] {
   private var aboutBox: AboutBox = _
 
   private var stage: Stage = _
   private var appInfo: AppInfo = _
   private var workspace: GraphWorkspace[V, L, G] = _
-
-
-  private lazy val consoleFileChooser: FileChooser = {
-    val fileChooser =
-      new FileChooser
-
-    fileChooser.extensionFilters.setAll(
-      new FileChooser.ExtensionFilter("Text file", "*.txt"),
-      new FileChooser.ExtensionFilter("Any file", "*.*")
-    )
-
-    fileChooser.title =
-      "Save console output..."
-
-    fileChooser
-  }
-
-  private lazy val exportAsImageFileChooser: FileChooser = {
-    val fileChooser =
-      new FileChooser
-
-    fileChooser.extensionFilters.setAll(
-      new FileChooser.ExtensionFilter("PNG image", "*.png")
-    )
-
-    fileChooser.title =
-      "Export as image..."
-
-    fileChooser
-  }
-
 
   def scenarioRepository: ScenarioRepository =
     workspace.scenarioRepository
@@ -196,6 +165,8 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
   running.addListener((o: javafx.beans.value.ObservableValue[_ <: java.lang.Boolean], oldValue: java.lang.Boolean, newValue: java.lang.Boolean) => {
     if (newValue != oldValue) {
       if (running()) {
+        consoleArea.clear()
+
         algorithm =
           workspace.scenario.get.createAlgorithm()
 
@@ -281,6 +252,36 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
   }
 
 
+  private lazy val consoleFileChooser: FileChooser = {
+    val fileChooser =
+      new FileChooser
+
+    fileChooser.extensionFilters.setAll(
+      new FileChooser.ExtensionFilter("Text file", "*.txt"),
+      new FileChooser.ExtensionFilter("Any file", "*.*")
+    )
+
+    fileChooser.title =
+      "Save console output..."
+
+    fileChooser
+  }
+
+  private lazy val exportAsImageFileChooser: FileChooser = {
+    val fileChooser =
+      new FileChooser
+
+    fileChooser.extensionFilters.setAll(
+      new FileChooser.ExtensionFilter("PNG image", "*.png")
+    )
+
+    fileChooser.title =
+      "Export as image..."
+
+    fileChooser
+  }
+
+
   private def setupMenusAndToolbar() {
     val scenarioProperty =
       workspace.scenarioProperty
@@ -315,13 +316,13 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
 
 
     fullRunMenuItem.disable <==
-      (scenarioProperty === None) || (runState === InFullRun) || (runState === Complete)
+      (scenarioProperty === None) || (runState === InFullRun) || (runState === Finished)
 
     bindButton(fullRunButton, fullRunMenuItem)
 
 
     runStepMenuItem.disable <==
-      (scenarioProperty === None) || (runState === InFullRun) || (runState === Complete)
+      (scenarioProperty === None) || (runState === InFullRun) || (runState === Finished)
 
     bindButton(runStepButton, runStepMenuItem)
 
@@ -429,16 +430,23 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
     try {
       val image =
         if (running())
-          runtimeCanvas.get.snapshot(new SnapshotParameters(), null)
+          runtimeCanvas.get.snapshot(
+            new SnapshotParameters(),
+            null
+          )
         else
-          workspace.designCanvas.get.snapshot(new SnapshotParameters(), null)
+          workspace.designCanvas.get.snapshot(
+            new SnapshotParameters(),
+            null
+          )
 
       ImageIO.write(
         SwingFXUtils.fromFXImage(image, null),
         "png",
         imageFile
       )
-      Alerts.showInfo("Graph image exported successfully.")
+
+      Alerts.showInfo("Graph exported successfully.")
     } catch {
       case ex: Exception =>
         ex.printStackTrace(System.err)
@@ -487,7 +495,10 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
 
 
   def showScenarioName(): Unit = {
-    Alerts.showInfo(workspace.scenario.get.name, "Scenario name")
+    Alerts.showInfo(
+      workspace.scenario.get.name,
+      "Scenario name"
+    )
   }
 
   def showScenarioHelp(): Unit = {
@@ -497,7 +508,12 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
 
   def showScenarioSettings(): Unit = {
     workspace.scenario.get.showSettings(designGraph).foreach(newGraph =>
-      designGraph = newGraph
+      workspace.designCanvas = Some(
+        new GraphCanvas[V, L, G](
+          workspace.scenario.get.createDesignController(),
+          newGraph
+        )
+      )
     )
   }
 
@@ -512,6 +528,7 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
     val runStepsBeforePausing =
       workspace.scenario.get.runStepsBeforePausing
 
+
     while (internalRunStep()) {
       executedSteps += 1
 
@@ -522,7 +539,7 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
 
           case _ =>
             runState() =
-              Complete
+              Finished
 
             return
         }
@@ -541,13 +558,13 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
 
   private def internalRunStep(): Boolean = {
     try {
-      val (graphResult, canProceed) =
+      val (newGraph, canProceed) =
         algorithm.runStep(stepIndex, runtimeGraph, outputConsole)
 
-      require(graphResult != null)
+      require(newGraph != null)
 
       runtimeGraph =
-        graphResult
+        newGraph
 
       if (canProceed) {
         stepIndex +=
@@ -556,7 +573,7 @@ class MainWindowController[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGr
         true
       } else {
         runState() =
-          Complete
+          Finished
 
         false
       }

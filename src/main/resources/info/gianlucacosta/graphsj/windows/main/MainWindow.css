@@ -1,3 +1,7 @@
 #graphCanvasPane {
     -fx-background: grey;
 }
+
+#consoleArea {
+    -fx-font-family: monospace;
+}

@@ -32,8 +32,7 @@ import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.converters.ConversionException
 import com.thoughtworks.xstream.io.xml.StaxDriver
 import info.gianlucacosta.eighthbridge.fx.canvas.GraphCanvas
-import info.gianlucacosta.eighthbridge.fx.canvas.basic.{BasicLink, BasicVertex}
-import info.gianlucacosta.eighthbridge.graphs.point2point.visual.VisualGraph
+import info.gianlucacosta.eighthbridge.graphs.point2point.visual.{VisualGraph, VisualLink, VisualVertex}
 import info.gianlucacosta.graphsj.{App, Scenario, ScenarioRepository}
 import info.gianlucacosta.helios.apps.AppInfo
 import info.gianlucacosta.helios.desktop.DesktopUtils
@@ -54,15 +53,20 @@ private object GraphWorkspace {
     Pattern.compile(raw"graphsj-scenarios-\d+(?:[\d\.]+)\.jar")
 }
 
-private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: VisualGraph[V, L, G]](appInfo: AppInfo, stage: Stage, initialScenarioRepository: ScenarioRepository, documentFileChooser: FileChooser) extends Workspace(stage, documentFileChooser) {
+
+private class GraphWorkspace[V <: VisualVertex[V], L <: VisualLink[L], G <: VisualGraph[V, L, G]]
+(
+  appInfo: AppInfo,
+  stage: Stage,
+  initialScenarioRepository: ScenarioRepository,
+  documentFileChooser: FileChooser
+) extends Workspace(stage, documentFileChooser) {
   private val scenarioRepositoryLock =
     new Object
 
-
+  private var _scenarioRepository: ScenarioRepository = _
   private var xstream: XStream = _
 
-
-  private var _scenarioRepository: ScenarioRepository = _
 
   def scenarioRepository: ScenarioRepository = {
     scenarioRepositoryLock.synchronized {
@@ -72,10 +76,13 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
 
   def scenarioRepository_=(newValue: ScenarioRepository): Unit = {
     scenarioRepositoryLock.synchronized {
-      _scenarioRepository = newValue
+      _scenarioRepository =
+        newValue
 
-      xstream = new XStream(new StaxDriver)
-      xstream.setClassLoader(newValue.scenariosClassLoader)
+      xstream =
+        new XStream(new StaxDriver) {
+          setClassLoader(newValue.scenariosClassLoader)
+        }
     }
   }
 
@@ -96,7 +103,7 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
   scenarioProperty.addListener((observable: Observable) => {
     scenarioProperty().foreach(scenario => {
       val stylesheets =
-        MainWindowController.Stylesheet.toExternalForm :: scenario.stylesheets
+        MainWindowController.AppStylesheet.toExternalForm :: scenario.stylesheets
 
       stage.scene().getStylesheets.setAll(stylesheets: _*)
     })
@@ -109,8 +116,7 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
   def designCanvas: Option[GraphCanvas[V, L, G]] =
     designCanvasProperty.get
 
-
-  private def designCanvas_=(newValue: Option[GraphCanvas[V, L, G]]): Unit = {
+  def designCanvas_=(newValue: Option[GraphCanvas[V, L, G]]): Unit = {
     designCanvasProperty.set(newValue)
   }
 
@@ -127,13 +133,17 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
 
       val noScenariosAlert = new Alert(AlertType.Confirmation) {
         initOwner(stage)
-        headerText = "No scenarios installed"
+
+        headerText =
+          "No scenarios installed"
+
         contentText = (
           s"${appInfo.name} requires at least one scenario.\n\n"
             + s"${appInfo.name} can automatically install the predefined scenario pack; alternatively, "
             + "you can download one or more .jar files providing scenarios and copy them "
             + "to the scenarios directory."
           )
+
 
         buttonTypes = List(
           installPredefinedScenariosButton,
@@ -156,53 +166,50 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
           showScenariosDirectory()
 
         case _ =>
-          //Just do nothing
+        //Just do nothing
       }
 
       return false
     }
 
-    val scenarioFactoryOption = InputDialogs.askForItem(
-      "Scenario:",
-      scenarioRepository.scenarioFactories,
-      header = "New scenario..."
-    )
 
-    if (scenarioFactoryOption.isEmpty) {
-      return false
-    }
+    val scenarioFactoryOption =
+      InputDialogs.askForItem(
+        "Scenario:",
+        scenarioRepository.scenarioFactories,
+        header = "New scenario..."
+      )
 
-    val newScenarioOption =
-      scenarioFactoryOption.get.createScenario.asInstanceOf[Option[Scenario[V, L, G]]]
+    scenarioFactoryOption.exists(scenarioFactory => {
+      val newScenarioOption =
+        scenarioFactory.createScenario.asInstanceOf[Option[Scenario[V, L, G]]]
 
+      newScenarioOption.exists(newScenario => {
+        val newDesignCanvas =
+          new GraphCanvas[V, L, G](
+            newScenario.createDesignController(),
+            newScenario.createDesignGraph()
+          )
 
-    if (newScenarioOption.isEmpty) {
-      return false
-    }
+        scenario =
+          Some(newScenario)
 
-    val newScenario =
-      newScenarioOption.get
+        designCanvas =
+          Some(newDesignCanvas)
 
-
-    val newDesignCanvas = new GraphCanvas[V, L, G](
-      newScenario.createDesignController(),
-      newScenario.createDesignGraph()
-    )
-
-    scenario =
-      Some(newScenario)
-
-    designCanvas =
-      Some(newDesignCanvas)
-
-    true
+        true
+      })
+    })
   }
 
 
   override protected def doOpen(sourceFile: File): Boolean = {
     try {
       val sourceReader =
-        new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")
+        new InputStreamReader(
+          new FileInputStream(sourceFile),
+          "UTF-8"
+        )
 
       try {
         val loadedObject =
@@ -213,25 +220,37 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
         val document =
           loadedObject.asInstanceOf[GraphDocument[_, _, _]]
 
-        scenario = Some(document.scenario.asInstanceOf[Scenario[V, L, G]])
-        designCanvas = Some(new GraphCanvas[V, L, G](
-          document.scenario.asInstanceOf[Scenario[V, L, G]].createDesignController(),
-          document.designGraph.asInstanceOf[G]
-        ))
+        scenario =
+          Some(document.scenario.asInstanceOf[Scenario[V, L, G]])
+
+        designCanvas =
+          Some(new GraphCanvas[V, L, G](
+            document.scenario.asInstanceOf[Scenario[V, L, G]].createDesignController(),
+            document.designGraph.asInstanceOf[G]
+          ))
       } finally {
         sourceReader.close()
       }
 
     } catch {
       case ex: ConversionException =>
-        ex.printStackTrace(System.err)
+        val lastColonIndex =
+          ex.getShortMessage.lastIndexOf(":")
 
-        val scenarioName =
-          ex.getShortMessage.substring(0, ex.getShortMessage.lastIndexOf(":")).trim
+        if (lastColonIndex > -1) {
+          ex.printStackTrace(System.err)
 
-        Alerts.showWarning(s"The requested scenario cannot be loaded:\n\n'${scenarioName}'\n\nPlease, ensure that the related JAR file is available in the scenarios directory.")
+          val scenarioName =
+            ex.getShortMessage.substring(0, lastColonIndex).trim
 
-        showScenariosDirectory()
+          Alerts.showWarning(
+            s"The requested scenario cannot be loaded:\n\n'${scenarioName}'\n\nPlease, ensure that the related JAR file is available in the scenarios directory."
+          )
+
+          showScenariosDirectory()
+        } else {
+          Alerts.showException(ex)
+        }
     }
 
     true
@@ -239,13 +258,17 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
 
 
   override protected def doSave(targetFile: File): Boolean = {
-    val document = GraphDocument[V, L, G](
-      scenario.get,
-      designCanvas.get.graph
-    )
+    val document =
+      GraphDocument[V, L, G](
+        scenario.get,
+        designCanvas.get.graph
+      )
 
     val targetWriter =
-      new OutputStreamWriter(new FileOutputStream(targetFile), "UTF-8")
+      new OutputStreamWriter(
+        new FileOutputStream(targetFile),
+        "UTF-8"
+      )
 
     try {
       scenarioRepositoryLock.synchronized {
@@ -267,23 +290,29 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
         App.ScenariosDirectory
           .listFiles()
           .find(file =>
-            GraphWorkspace.PredefinedScenariosJarFileNameRegex.matcher(file.getName).matches()
+            GraphWorkspace
+              .PredefinedScenariosJarFileNameRegex
+              .matcher(file.getName)
+              .matches()
           )
 
 
       if (existingScenariosJarFile.nonEmpty) {
-        val reinstallOption = InputDialogs.askYesNoCancel(
-          "The predefined scenarios are already installed.\n\nDo you wish to reinstall them?",
-          s"${appInfo.name} - Scenarios"
-        )
+        val reinstallOption =
+          InputDialogs.askYesNoCancel(
+            "The predefined scenarios are already installed.\n\nDo you wish to reinstall them?",
+            s"${appInfo.name} - Scenarios"
+          )
 
         if (!reinstallOption.contains(true)) {
           return
         }
 
-        if (!existingScenariosJarFile.get.delete()) {
-          throw new RuntimeException(s"Cannot delete the predefined scenarios file:\n'${existingScenariosJarFile.get.getAbsolutePath}'")
-        }
+
+        require(
+          existingScenariosJarFile.get.delete(),
+          s"Cannot delete the predefined scenarios file:\n'${existingScenariosJarFile.get.getAbsolutePath}'"
+        )
       }
 
       new BusyDialog(
@@ -302,12 +331,8 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
 
 
   private def downloadPredefinedScenariosJar(): Unit = {
-    val scenariosApiUrl =
-      new URL("https://api.github.com/repos/giancosta86/GraphsJ-scenarios/releases/latest")
-
-
     val scenariosApiJsonReader =
-      Json.createReader(scenariosApiUrl.openStream())
+      Json.createReader(App.ScenariosApiUrl.openStream())
 
 
     try {
@@ -325,7 +350,10 @@ private class GraphWorkspace[V <: BasicVertex[V], L <: BasicLink[L], G <: Visual
           assetObject.getString("name")
 
         val isScenariosJarAsset =
-          GraphWorkspace.PredefinedScenariosJarFileNameRegex.matcher(assetName).matches()
+          GraphWorkspace
+            .PredefinedScenariosJarFileNameRegex
+            .matcher(assetName)
+            .matches()
 
         if (isScenariosJarAsset) {
           val targetFile =

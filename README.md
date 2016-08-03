@@ -8,7 +8,7 @@
 
 ## Introduction
 
-GraphsJ is a modern didactic application dedicated to interactively executing graph algorithms; it features both a ScalaFX visual user interface and a [Scenario Development Kit](https://github.com/giancosta86/GraphsJ-sdk) - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
+GraphsJ is a modern didactic application and framework dedicated to interactively executing graph algorithms; it features both a ScalaFX visual user interface and a [Scenario Development Kit](https://github.com/giancosta86/GraphsJ-sdk) - to create *custom scenarios* based on the [EighthBridge](https://github.com/giancosta86/EighthBridge) toolkit for ScalaFX.
 
 Starting from version 5.0, GraphsJ targets two paramount, complementary fields of study:
 
@@ -17,21 +17,27 @@ Starting from version 5.0, GraphsJ targets two paramount, complementary fields o
 * **Artificial Intelligence**, via the introduction of [LambdaPrism](https://github.com/giancosta86/LambdaPrism) into the application kernel
 
 
-The application includes predefined scenarios dealing with problems from both fields - in particular:
+GraphsJ includes predefined scenarios dealing with problems from both fields - in particular:
 
-* A customized version of **GraphPlan** for Artificial Intelligence
+* **Artificial Intelligence**:
 
-* Prim's **Shortest Spanning Tree (SST)** for Operations Research
+  * *PlanBricks*, which is an interactive canvas for solving **Partial Order Planning (POP)** problems
+
+  * A customized version of **GraphPlan**, which generates a *construction graph* showing *Add* and *Delete* arcs applied to positive literals
+
+* **Operations Research**:
+
+  * Prim's **Shortest Spanning Tree (SST)**, which is a very interdisciplinary algorithm
 
 
-GraphsJ is profoundly influenced by the elegance and effectiveness of *Functional Programming*, which it mixes with OOP techniques thanks to the [Scala](http://www.scala-lang.org/) programming language.
+GraphsJ is inspired by the *elegance* and *effectiveness* of **Functional Programming**, which it mixes with OOP techniques thanks to the [Scala](http://www.scala-lang.org/) programming language.
 
 
 ## Features
 
 * *Modern user interface*, employing **ScalaFX**
 
-* *Flexible and vastly enhanced canvas* to draw and edit graphs, now supporting **zoom** and **pan**, similar to map navigation
+* *Flexible and vastly enhanced canvas* to draw and edit graphs, supporting **zoom** and **pan**, similar to map navigation
 
 * ScalaFX-based **SDK**, enabling anyone to easily *create new scenarios*
 
@@ -64,9 +70,6 @@ Otherwise, to start the application:
 1. Download and decompress the zip archive
 2. Run the file *bin/GraphsJ* (on UNIX) or *bin/GraphsJ.bat* (on Windows)
 
-**Users who installed GraphsJ 3 via MoonDeploy can just run the program: MoonDeploy will automatically update it to GraphsJ 4**.
-
-
 
 ## Online help
 
@@ -82,6 +85,8 @@ For detailed information, please refer to the [SDK project page](https://github.
 
 ## Screenshots
 
+![Partial Order Planning](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/PartialOrderPlanning.png)
+
 ![Add/Delete GraphPlan](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/AdGraphPlan.png)
 
 ![Prim's Shortest Spanning Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/PrimSST.png)
@@ -90,12 +95,19 @@ For detailed information, please refer to the [SDK project page](https://github.
 
 ## Special thanks
 
-Special thanks to:
+### Operations Research
 
 * [Professor Silvano Martello](http://www.or.deis.unibo.it/staff_pages/martello/cvitae.html)
-* [Dott. Claudia D'Ambrosio](http://www.lix.polytechnique.fr/~dambrosio/)
 
-for their suggestions.
+* [Dott.ssa Claudia D'Ambrosio](http://www.lix.polytechnique.fr/~dambrosio/)
+
+
+### Artificial Intelligence
+
+* [Prof.ssa Michela Milano](http://ai.unibo.it/people/MichelaMilano)
+
+
+### Icons
 
 The icons in the menu and toolbar are part of the [Crystal Clear icon set](https://commons.wikimedia.org/wiki/Crystal_Clear), by [Everaldo Coelho](https://en.wikipedia.org/wiki/Everaldo_Coelho).
 
