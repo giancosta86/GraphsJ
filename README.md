@@ -25,6 +25,9 @@ GraphsJ includes predefined scenarios dealing with problems from both fields - i
 
   * A customized version of **GraphPlan**, which generates a *construction graph* showing *Add* and *Delete* arcs applied to positive literals
 
+  * A basic scenario introducing a paramount Data Mining concept: decision trees!
+
+
 * **Operations Research**:
 
   * Prim's **Shortest Spanning Tree (SST)**, which is a very interdisciplinary algorithm
@@ -88,6 +91,8 @@ For detailed information, please refer to the [SDK project page](https://github.
 ![Partial Order Planning](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/PartialOrderPlanning.png)
 
 ![Add/Delete GraphPlan](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/AdGraphPlan.png)
+
+![Basic Decision Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/BasicDecisionTree.png)
 
 ![Prim's Shortest Spanning Tree](https://github.com/giancosta86/GraphsJ-scenarios/blob/master/screenshots/PrimSST.png)
 
