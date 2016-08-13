@@ -20,6 +20,10 @@ body,
 }
 
 
+#main_content {
+  margin-top: 3em;
+}
+
 
 @media (max-width: 999px) {
   .facet_sidebar {
