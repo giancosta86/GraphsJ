@@ -30,7 +30,7 @@ buildscript {
     dependencies {
         classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.3'
         classpath 'info.gianlucacosta.moondeploy:moondeploy-gradle:3.3'
-        classpath 'info.gianlucacosta.aurora:aurora:7.0'
+        classpath 'info.gianlucacosta.aurora:aurora:8.0'
     }
 }
 
@@ -44,7 +44,7 @@ apply plugin: 'info.gianlucacosta.aurora'
 
 group = 'info.gianlucacosta.graphsj'
 archivesBaseName = 'graphsj'
-version = '6.1'
+version = '6.2'
 
 description = 'ScalaFX didactic application for graph algorithms'
 
